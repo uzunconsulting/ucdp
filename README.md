@@ -12,12 +12,12 @@ Vorhaben, die mit KI-Assistenten (Claude Code, ChatGPT, Cursor,
 Cline o. Ä.) gebaut, gepflegt und weiterentwickelt werden.
 
 Das Pattern ist aus der Praxis entstanden — aus mehreren parallel
-laufenden Projekten bei Uzun Consulting und Aviation Trade Services,
-die mit Claude Code agentisch gebaut werden. Ziel des Patterns ist,
-dass ein KI-Assistent zu Beginn jeder Session den Projektstand
-selbständig versteht, während der Arbeit konsistent pflegt und Drift
-zwischen Konzept, Code und Dokumentation sichtbar macht — ohne dass
-der Projektbetreuer das in jeder Session neu erklärt.
+laufenden Projekten bei Uzun Consulting, die agentisch mit KI-
+Assistenten gebaut werden. Ziel des Patterns ist, dass ein KI-
+Assistent zu Beginn jeder Session den Projektstand selbständig
+versteht, während der Arbeit konsistent pflegt und Drift zwischen
+Konzept, Code und Dokumentation sichtbar macht — ohne dass der
+Projektbetreuer das in jeder Session neu erklärt.
 
 ## 1. Philosophie
 
@@ -89,7 +89,7 @@ dreigeteilten Aufbau:
 ---
 project: <projektname>
 last_reviewed: YYYY-MM-DD
-last_reviewed_by: <name>
+last_reviewed_by: <n>
 source: docs/_source/<originaldokument>    # optional
 ---
 
@@ -126,10 +126,10 @@ Jede Datei in `docs/` beginnt mit einem YAML-Frontmatter-Block:
 
 ```yaml
 ---
-project: ats-dashboard
-last_reviewed: 2026-04-20
-last_reviewed_by: Mustafa Uzun
-source: docs/_source/ATS_Dashboard_Agent_Concept.docx
+project: <projektname>
+last_reviewed: YYYY-MM-DD
+last_reviewed_by: <n>
+source: docs/_source/<originaldokument>    # optional
 ---
 ```
 
@@ -151,10 +151,10 @@ bekannte Abweichung zwischen Ziel und Ist bekommt eine ID und einen
 Eintrag in einer Tabelle:
 
 ```markdown
-| ID      | Bereich                | Soll                        | Ist                         | Offene Arbeit                | Priorität | ADR       |
-|---------|------------------------|-----------------------------|-----------------------------|------------------------------|-----------|-----------|
-| DSH-001 | architecture/intake    | Stündlicher Pull            | Tägliches Cron um 06:00 UTC | Cron-Intervall erhöhen       | P2        | —         |
-| DSH-002 | datamodel/rls          | RLS-Policy mit Parent-Check | Nur is_public-Check         | Policy-Präzisierung in 03    | P1        | ADR-0006  |
+| ID       | Bereich                | Soll                        | Ist                         | Offene Arbeit                | Priorität | ADR       |
+|----------|------------------------|-----------------------------|-----------------------------|------------------------------|-----------|-----------|
+| PROJ-001 | architecture/intake    | Stündlicher Pull            | Tägliches Cron um 06:00 UTC | Cron-Intervall erhöhen       | P2        | —         |
+| PROJ-002 | datamodel/rls          | RLS-Policy mit Parent-Check | Nur is_public-Check         | Policy-Präzisierung in 03    | P1        | ADR-0006  |
 ```
 
 **ID-Konvention**: Projektspezifisches Präfix plus fortlaufende
@@ -179,7 +179,7 @@ behandelt und Nachgelagertes als P1-Delta erfasst.
 sondern mit Strikethrough und Datum markiert:
 
 ```markdown
-| ~~DSH-011~~ | ~~outbound/email~~ | ~~Resend verdrahten~~ | ~~erledigt 2026-04-20~~ | — | ~~P1~~ | ADR-0014 |
+| ~~PROJ-011~~ | ~~outbound/email~~ | ~~Mail-Service verdrahten~~ | ~~erledigt YYYY-MM-DD~~ | — | ~~P1~~ | ADR-0014 |
 ```
 
 So bleibt die Historie sichtbar, was wann warum geschlossen wurde.
@@ -199,9 +199,9 @@ feste Nummerierung und Cross-Repo-Verweise hinzu.
 Jedes ADR folgt dem Schema:
 
 ```markdown
-## ADR-0006 · RLS-Defense-in-Depth bei öffentlichen Dateien
+## ADR-0006 · <Titel der Entscheidung>
 
-**Status:** Akzeptiert (2026-04-18)
+**Status:** Akzeptiert (YYYY-MM-DD)
 
 ### Kontext
 
@@ -219,9 +219,9 @@ Folgefragen, Querverweise auf andere ADRs oder Deltas.>
 
 ### Verweise
 
-- Implementierung: `supabase/migrations/0010_file_attachments.sql`
-- Verwandtes ADR im anderen Repo: ats-website/ADR-0006
-- Betroffenes Delta: DSH-002
+- Implementierung: `<pfad/zur/umsetzung>`
+- Verwandtes ADR im anderen Repo: `<andere-app/ADR-NNNN>`
+- Betroffenes Delta: `PROJ-NNN`
 ```
 
 **Wichtige Regeln für ADRs**:
@@ -337,10 +337,11 @@ Session-Disziplin füllen. Ab jetzt wird bei jeder neuen Session die
 Leseroutine automatisch aufgerufen, und bei jedem Commit die
 Update-Pflicht geprüft.
 
-Erfahrungswert aus der Praxis: Ein mittelgroßes Next.js-Projekt
-(~5000 Codezeilen, eine Supabase-Datenbank, Vercel-Deployment) braucht
-etwa 4–6 Stunden fokussierte Arbeit für Phase A bis D, verteilt auf
-eine bis zwei Sessions. Größere Projekte proportional mehr.
+Erfahrungswert aus der Praxis: Ein mittelgroßes Webprojekt (einige
+tausend Codezeilen, eine Datenbank, eine Deployment-Plattform)
+braucht etwa 4–6 Stunden fokussierte Arbeit für Phase A bis D,
+verteilt auf eine bis zwei Sessions. Größere Projekte proportional
+mehr.
 
 ## 9. Cross-Projekt-Regeln (optional)
 
@@ -349,11 +350,12 @@ Datenbank, gemeinsame Deployment-Infrastruktur oder Schnittstellen —
 dann braucht das Pattern eine klare Single-Source-of-Truth-Regel pro
 geteiltem Thema.
 
-Beispiel aus der Praxis: Ein ATS-Dashboard und eine ATS-Website
-teilen eine Supabase-Datenbank. Das Datenmodell wird in beiden Repos
-dokumentiert, aber als SoT gilt das Dashboard-`03-datamodel.md`. Die
-Website-`03-datamodel.md` dokumentiert nur eigene Reads, Views und
-Policies und verweist für das Schema-Gesamtbild auf das Dashboard.
+Beispiel: Zwei Anwendungen (etwa ein Backoffice-Tool und eine
+öffentliche Website) teilen sich eine Datenbank. Das Datenmodell wird
+in beiden Repos dokumentiert, aber als SoT gilt das Repo der
+Anwendung, die das Schema primär definiert und migriert. Das zweite
+Repo dokumentiert nur eigene Reads, Views und Policies und verweist
+für das Schema-Gesamtbild auf das SoT-Repo.
 
 Die Regel dazu in beiden AGENTS.md:
 
@@ -363,17 +365,17 @@ Die Regel dazu in beiden AGENTS.md:
 > aktualisieren, im anderen Repo Verweis-Update falls nötig.
 
 Das verhindert, dass sich die beiden Repos auseinander entwickeln und
-Claude Code in einer Website-Session nicht weiß, was im Dashboard
-gerade passiert ist.
+der KI-Assistent in einer Session im einen Repo nicht weiß, was im
+anderen gerade passiert ist.
 
 ## 10. Geheimnisse und Secrets
 
 Das Pattern hat eine harte Regel: **Secrets niemals in der Doku.**
 Keine API-Keys, keine Webhook-Secrets, keine Connection-Strings mit
 Passwort. In `04-deployment.md` stehen nur Variablennamen (z. B.
-`RESEND_API_KEY`, `SHOPIFY_WEBHOOK_SECRET`), die tatsächlichen Werte
-leben in `.env.local` (gitignored), bei Vercel, in Supabase Vault oder
-in einem Password-Manager.
+`EMAIL_API_KEY`, `WEBHOOK_SECRET`, `DATABASE_URL`), die tatsächlichen
+Werte leben in `.env.local` (gitignored), in der Secret-Verwaltung
+der Deployment-Plattform oder in einem Password-Manager.
 
 Diese Regel scheint offensichtlich, wird aber in der Praxis oft
 verletzt, weil „nur eben kurz zur Doku dazupacken" praktisch ist. Es
@@ -406,7 +408,7 @@ wichtigsten Templates zum Kopieren.
 ---
 project: <projektname>
 last_reviewed: <YYYY-MM-DD>
-last_reviewed_by: <name>
+last_reviewed_by: <n>
 ---
 
 # Projektdokumentation
@@ -436,7 +438,7 @@ Diese Dokumentation folgt dem Uzun Consulting Documentation Pattern
 ---
 project: <projektname>
 last_reviewed: <YYYY-MM-DD>
-last_reviewed_by: <name>
+last_reviewed_by: <n>
 ---
 
 # Status — offene Deltas Ziel ↔ Ist
@@ -458,7 +460,7 @@ last_reviewed_by: <name>
 ---
 project: <projektname>
 last_reviewed: <YYYY-MM-DD>
-last_reviewed_by: <name>
+last_reviewed_by: <n>
 ---
 
 # Architectural Decision Records
