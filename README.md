@@ -158,11 +158,11 @@ Eintrag in einer Tabelle:
 ```
 
 **ID-Konvention**: Projektspezifisches Präfix plus fortlaufende
-Nummer. Beispiele: `DSH-` (Dashboard), `WEB-` (Website), `PT-`
-(Prüfungstrainer). Die Präfixe werden pro Projekt einmal festgelegt
-und nie geändert. Vorteil: Wenn jemand „Delta 5" sagt, ist unklar,
-welches Projekt gemeint ist — „DSH-005" und „WEB-005" sind
-unverwechselbar.
+Nummer, z. B. `PROJ-001`, `PROJ-002`. Das Präfix wird pro Projekt
+einmal festgelegt und nie geändert. In Multi-Projekt-Setups
+verhindert das Verwechslungen: Wenn jemand nur „Delta 5" sagt, ist
+unklar, welches Projekt gemeint ist — ein projektspezifisches
+Präfix wie `APP-005` oder `SHOP-005` ist dagegen unverwechselbar.
 
 **Prioritäten**:
 
