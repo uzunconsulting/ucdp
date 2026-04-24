@@ -2,7 +2,7 @@
 title: Uzun Consulting Documentation Pattern (UCDP)
 version: 1.0
 last_reviewed: 2026-04-24
-author: Mustafa Uzun (in Zusammenarbeit mit Claude)
+author: Mustafa Uzun
 ---
 
 # Uzun Consulting Documentation Pattern (UCDP)
