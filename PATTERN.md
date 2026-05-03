@@ -1,6 +1,6 @@
 ---
 title: Uzun Consulting Documentation Pattern (UCDP)
-version: 1.1
+version: 1.2
 last_reviewed: 2026-05-03
 author: Mustafa Uzun
 ---
@@ -56,7 +56,8 @@ Struktur:
 ```
 projekt-repo/
 ├── README.md            (Projekt-README — kein UCDP-Inhalt)
-├── CLAUDE.md            (oder AGENTS.md — Session-Disziplin)
+├── CLAUDE.md            (Session-Disziplin, Quelle)
+├── AGENTS.md            (Pointer auf CLAUDE.md, optional)
 ├── docs/
 │   ├── README.md        (Doku-Konventionen-Index)
 │   ├── 00-handover-YYYY-MM-DD.md  (optional, historisch)
@@ -283,15 +284,63 @@ Konsequenz-Bullet eines bestehenden ADR oder als Delta. Die
 Faustregel: Ein ADR lohnt sich, wenn die Entscheidung später
 jemanden verwirren oder einen Commit in Frage stellen könnte.
 
-## 7. `CLAUDE.md` / `AGENTS.md` — Session-Disziplin
+## 7. `CLAUDE.md` und `AGENTS.md` — Pointer und Quelle
 
-Das ist die Datei, die dem KI-Assistenten am Anfang jeder Session
-sagt, wie er mit der Dokumentation umgehen soll. Der Name hängt
-vom Tool ab — Claude Code liest `CLAUDE.md`, andere Tools lesen
-`AGENTS.md`, manche lesen beide. Inhaltlich identisch.
+Verschiedene Coding-Agents suchen nach unterschiedlichen
+Dateinamen, um Projekt-Disziplin zu lesen. Claude Code liest
+`CLAUDE.md`. Andere Tools (Cursor, Aider, Copilot u. a.) folgen
+dem informellen `agents.md`-Standard. Statt zwei parallele
+Dateien zu pflegen — mit unvermeidlichem Drift-Risiko —
+unterscheidet UCDP zwischen **Quelle** und **Pointer**:
 
-Ein vollständiges Skelett liegt im Template-Repo unter
-`/CLAUDE.md`. Es enthält die Sektionen:
+- **`CLAUDE.md`** ist die **Quelle**. Hier lebt der gesamte
+  inhaltliche Stand: Projekt-Beschreibung, Session-Disziplin,
+  Doku-Struktur, Tech-Stack, Cross-Projekt-Regeln, Verhalten
+  bei Doku/Code-Widerspruch. Nur diese Datei wird inhaltlich
+  gepflegt.
+- **`AGENTS.md`** ist der **Pointer**. Sie ist sehr kurz und
+  verweist auf `CLAUDE.md`. Sie existiert nur, damit Tools, die
+  nach dem `agents.md`-Standard suchen, einen klaren
+  Einstiegspunkt finden.
+
+### Aufbau von `AGENTS.md`
+
+`AGENTS.md` enthält zwei BEGIN/END-markierte Sektionen:
+
+```
+<!-- BEGIN:tool-rules -->
+<!-- Tool-generierte Sektionen dürfen hier eingefügt werden
+     (z. B. von `create-next-app` für Next.js-spezifische
+     Hinweise). Diese Sektion wird von Tools überschrieben.
+     Eigene Inhalte gehören NICHT hierher, sondern in
+     CLAUDE.md. -->
+<!-- END:tool-rules -->
+
+<!-- BEGIN:session-start -->
+# Session-Start-Routine
+
+Dieses Projekt nutzt UCDP (Uzun Consulting Documentation Pattern).
+Die operative Quelle für Session-Disziplin, Doku-Struktur und
+Projekt-Regeln ist `CLAUDE.md` im Repo-Root. Lies sie vor jeder
+inhaltlichen Arbeit, gefolgt von `docs/05-status.md` (offene
+Deltas).
+
+Diese Datei (`AGENTS.md`) ist nur Pointer für Coding-Agents, die
+nach dem `agents.md`-Standard suchen. Inhalte werden hier nicht
+gepflegt.
+<!-- END:session-start -->
+```
+
+Die `tool-rules`-Sektion ist bewusst leer und für Tool-Output
+reserviert. Frameworks wie `create-next-app` schreiben dort z. B.
+Next.js-spezifische Hinweise hinein. Solange eigene Inhalte nur
+in der `session-start`-Sektion und nicht in `tool-rules` stehen,
+gehen Tool-Updates nicht verloren.
+
+### Aufbau von `CLAUDE.md`
+
+`CLAUDE.md` ist das operative Rückgrat. Sie enthält die
+Sektionen:
 
 - Projekt in 5 Zeilen
 - Session-Start — Leseroutine
@@ -302,9 +351,34 @@ Ein vollständiges Skelett liegt im Template-Repo unter
 - Cross-Projekt-Regeln (optional, falls relevant)
 - Verhalten bei Doku-/Code-Widerspruch
 
-Die `CLAUDE.md` ist das operative Rückgrat des Patterns. Ohne sie
-liest der KI-Assistent die Doku nicht proaktiv. Mit ihr wird die
-Doku-Disziplin automatisch Teil jeder Session.
+Ein vollständiges Skelett liegt im Template-Repo unter
+`/CLAUDE.md`. Im Header der Datei steht ein expliziter
+Verweis auf die Pointer-Rolle von `AGENTS.md`, damit das
+Verhältnis selbsterklärend ist.
+
+### Begründung dieser Trennung
+
+Drei Gründe sprechen für Pointer/Quelle statt zwei
+inhaltsgleiche Dateien:
+
+- **Multi-Tool-Support**. Ein Projekt kann gleichzeitig mit
+  Claude Code, Cursor und ChatGPT bearbeitet werden. Beide
+  Datei-Standards werden bedient, ohne Inhaltspflege zu
+  duplizieren.
+- **Resilienz gegen Tool-Generierung**. Frameworks wie
+  `create-next-app` schreiben in `AGENTS.md` (BEGIN/END-
+  markierte Sektionen). Liegt die Projekt-Disziplin dort,
+  riskiert jeder Tool-Update einen Merge-Konflikt. Liegt sie in
+  `CLAUDE.md`, ist `AGENTS.md` frei für Tool-Output.
+- **Aufgabentrennung**. `AGENTS.md` ist kurz, generisch und
+  änderungsarm. `CLAUDE.md` ist projektspezifisch und
+  änderungsreich. Die kurze Datei passt zum Tool-Standard, die
+  lange zum Projekt.
+
+Ohne `CLAUDE.md` liest der KI-Assistent die Doku nicht proaktiv.
+Mit ihr — und mit `AGENTS.md` als Tool-übergreifendem
+Einstiegspunkt — wird die Doku-Disziplin automatisch Teil jeder
+Session, unabhängig vom verwendeten Tool.
 
 ## 8. Setup-Phasen für ein neues Projekt
 
@@ -456,7 +530,7 @@ einzigen Sitzung im Kopf behalten kann.
 ## 13. Pattern-Versionierung
 
 Die Pattern-Konvention selbst entwickelt sich weiter. Aktuelle
-Version: **1.1**. Änderungen werden als Anhang in dieser Datei
+Version: **1.2**. Änderungen werden als Anhang in dieser Datei
 dokumentiert.
 
 ### Versionshistorie
@@ -467,6 +541,11 @@ dokumentiert.
   Anti-Pattern-Sektion; Skalierungs-Hinweise zum Delta-Register;
   Verhältnis zur Root-README geklärt; `CLAUDE.md` als
   primärer Name (`AGENTS.md` weiterhin als Alias erwähnt).
+- **1.2** (2026-05-03) — Pointer/Quelle-Trennung zwischen
+  `AGENTS.md` und `CLAUDE.md` formalisiert. `CLAUDE.md` ist
+  die inhaltliche Quelle, `AGENTS.md` ein kurzer Pointer mit
+  BEGIN/END-markierten Tool-Sektionen. Abschnitt 7 entsprechend
+  umgeschrieben.
 
 ## 14. Abschluss
 

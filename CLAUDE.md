@@ -1,10 +1,18 @@
 # <projektname>
 
 > Diese Datei ist das operative Rückgrat für KI-Assistenten
-> (Claude Code, ChatGPT, Cursor o. Ä.). Sie beschreibt, wie der
-> Assistent in jeder Session mit der Doku umgeht. Ersetze die
-> Platzhalter `<…>` durch deine Projektwerte; die Sektions-
-> struktur sollte erhalten bleiben.
+> (Claude Code, ChatGPT, Cursor o. Ä.) und die **Quelle** für
+> Session-Disziplin, Doku-Struktur und Projekt-Regeln. Sie
+> beschreibt, wie der Assistent in jeder Session mit der Doku
+> umgeht. Ersetze die Platzhalter `<…>` durch deine
+> Projektwerte; die Sektionsstruktur sollte erhalten bleiben.
+>
+> **Verhältnis zu `AGENTS.md`**: `AGENTS.md` im Repo-Root ist
+> nur Pointer auf diese Datei (für Tools, die nach dem
+> `agents.md`-Standard suchen). Inhaltliche Pflege erfolgt
+> ausschließlich hier — `AGENTS.md` wird nicht inhaltlich
+> ergänzt, abgesehen von tool-generierten Sektionen zwischen
+> den `BEGIN:tool-rules`-Markern.
 
 ## Projekt in 5 Zeilen
 

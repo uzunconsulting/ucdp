@@ -1,5 +1,14 @@
 # newsletter-tool
 
+> Diese Datei ist das operative Rückgrat für KI-Assistenten und
+> die **Quelle** für Session-Disziplin, Doku-Struktur und
+> Projekt-Regeln.
+>
+> **Verhältnis zu `AGENTS.md`**: `AGENTS.md` im Repo-Root ist
+> nur Pointer auf diese Datei (für Tools, die nach dem
+> `agents.md`-Standard suchen). Inhaltliche Pflege erfolgt
+> ausschließlich hier.
+
 ## Projekt in 5 Zeilen
 
 newsletter-tool ist eine Self-hosted-Newsletter-Anwendung für

@@ -44,7 +44,8 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
 │                              ersetzen)
 ├── PATTERN.md               ← die UCDP-Konvention im Detail
 ├── LICENSE                  ← CC-BY-4.0
-├── CLAUDE.md                ← Skelett für Session-Disziplin
+├── CLAUDE.md                ← Session-Disziplin (Quelle, projektspezifisch)
+├── AGENTS.md                ← Pointer auf CLAUDE.md (Tool-Konvention)
 ├── .gitignore               ← Standard für Web-Projekte
 ├── docs/                    ← Skelett der Projektdokumentation
 │   ├── README.md
@@ -73,7 +74,7 @@ CC-BY-4.0 — frei nutzbar mit Quellenangabe. Siehe `LICENSE`.
 
 ## Pattern-Versionierung
 
-Aktuelle UCDP-Version: **1.1** (siehe `PATTERN.md` Frontmatter).
+Aktuelle UCDP-Version: **1.2** (siehe `PATTERN.md` Frontmatter).
 
 Änderungen am Pattern selbst werden in `PATTERN.md` dokumentiert.
 Projekte, die auf einer älteren Version aufgesetzt wurden,
