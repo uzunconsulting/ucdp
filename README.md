@@ -74,7 +74,10 @@ CC-BY-4.0 — frei nutzbar mit Quellenangabe. Siehe `LICENSE`.
 
 ## Pattern-Versionierung
 
-Aktuelle UCDP-Version: **1.2** (siehe `PATTERN.md` Frontmatter).
+Aktuelle UCDP-Version: **1.3** (siehe `PATTERN.md` Frontmatter).
+v1.3 hat eine optionale Erweiterung für agentisch gebaute
+Projekte ergänzt (`08-agent-runs.md`); Projekte ohne agentische
+Runs nutzen UCDP unverändert weiter.
 
 Änderungen am Pattern selbst werden in `PATTERN.md` dokumentiert.
 Projekte, die auf einer älteren Version aufgesetzt wurden,

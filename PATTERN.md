@@ -1,7 +1,7 @@
 ---
 title: Uzun Consulting Documentation Pattern (UCDP)
-version: 1.2
-last_reviewed: 2026-05-03
+version: 1.3
+last_reviewed: 2026-05-09
 author: Mustafa Uzun
 ---
 
@@ -68,16 +68,21 @@ projekt-repo/
 │   ├── 05-status.md     (Delta-Register — lebendes Dokument)
 │   ├── 06-decisions.md  (ADRs — unveränderlich)
 │   ├── 07-*.md          (projektspezifische Zusatzthemen, optional)
+│   ├── 08-agent-runs.md (Register autonomer Agent-Runs — optional)
 │   └── _source/         (historische Originaldokumente, nie editieren)
 └── src/                 (oder app/, der Code-Pfad)
 ```
 
-Die Nummerierung 01–06 ist fix. Zusätzliche Topic-Dateien
-(07 und aufwärts) sind projektspezifisch erlaubt, wenn ein Thema
-produktdefinierend ist und in 02–04 nicht gut untergebracht
-werden kann — zum Beispiel `07-glossary.md` für Projekte mit
-viel Fachsprache, oder `07-ai-evaluation.md` in einem Projekt,
-dessen Kern eine KI-Bewertungslogik ist.
+Die Nummerierung 01–06 sowie 08 sind pattern-reserviert; ihre
+Bedeutung ist in dieser Spezifikation festgelegt. Projekt-
+spezifische Topic-Dateien nutzen 07 oder Nummern ab 09, wenn
+ein Thema produktdefinierend ist und in 02–04 nicht gut
+untergebracht werden kann — zum Beispiel `07-glossary.md` für
+Projekte mit viel Fachsprache, oder `07-ai-evaluation.md` in
+einem Projekt, dessen Kern eine KI-Bewertungslogik ist.
+
+Die Datei `08-agent-runs.md` ist optional und nur dann sinnvoll,
+wenn das Projekt agentisch gebaut wird — siehe Abschnitt 10.
 
 Der Unterordner `_source/` enthält die ursprünglichen Konzept-
 Dokumente (Word-Dokumente, PDFs, exportierte Google Docs), aus
@@ -445,7 +450,111 @@ Das verhindert, dass sich die beiden Repos auseinander entwickeln
 und der KI-Assistent in einer Session im einen Repo nicht weiß,
 was im anderen gerade passiert ist.
 
-## 10. Geheimnisse und Secrets
+## 10. Agentische Runs (optional)
+
+UCDP entstand aus manuellen KI-Sessions: Mensch sitzt am Rechner,
+Assistent hilft, Code entsteht in einer interaktiven Schleife. Mit
+reifer werdenden agentischen Setups (Claude Code mit Subagenten,
+Headless-Runs, automatisierte Pipelines) treten zunehmend Sessions
+auf, in denen ein KI-Agent weitgehend autonom Code produziert,
+ohne dass jeder Schritt synchron beobachtet wird.
+
+Solche Runs sind nachvollziehbarkeitsrelevant: wer hat wann was
+gebaut, mit welcher Eingabe, welchen Subagenten, welchem Ergebnis.
+Diese Information gehört projektnah dokumentiert, damit sie später
+auffindbar bleibt und Drift zwischen autonom getroffenen
+Entscheidungen und der manuell gepflegten Doku sichtbar wird. Die
+optionale Datei `08-agent-runs.md` führt diese Runs als
+tabellarisches Register, analog zum Delta-Register aus Abschnitt 5.
+
+### Wann diese Erweiterung sinnvoll ist
+
+`08-agent-runs.md` lohnt sich, sobald in einem Projekt regelmäßig
+**autonome Agent-Sessions** stattfinden — also Sessions, in denen
+ein Coding-Agent mit Subagenten, Hooks und mindestens teilweiser
+Headless-Ausführung mehrere Code-Schritte ohne synchrone
+menschliche Bestätigung durchläuft. Für rein interaktive Sessions
+(Mensch fragt, Assistent antwortet, jeder Commit wird live
+gesehen) ist sie überflüssig.
+
+Sie ist auch sinnvoll, wenn solche Runs noch selten sind, das
+Projekt aber agentisch gebaut werden soll — dann gibt das Register
+von Anfang an einen Ort für Run-Dokumentation, anstatt sie später
+nachträglich erfassen zu müssen.
+
+### Aufbau
+
+`08-agent-runs.md` folgt dem Frontmatter-Standard und enthält eine
+Tabelle:
+
+| ID                | Datum-Start | Datum-Ende | Auslöser            | Eingesetzte Subagenten         | Erzeugte Deltas / ADRs | Ergebnis              | Status   |
+|-------------------|-------------|------------|---------------------|--------------------------------|------------------------|-----------------------|----------|
+| <PRÄFIX>-RUN-0001 | YYYY-MM-DD  | YYYY-MM-DD | „Spec X umsetzen"   | architect, backend-dev, tester | <PRÄFIX>-014, ADR-0008 | Merge in main         | Erledigt |
+| <PRÄFIX>-RUN-0002 | YYYY-MM-DD  | —          | „Bug PROJ-021 fixen"| backend-dev, tester            | —                      | Lauf abgebrochen, Cap | Aktiv    |
+
+**ID-Konvention**: Projekt-Präfix plus `RUN-NNNN`, z. B.
+`VLS-RUN-0001`. Gleicher Präfix wie Deltas, klar getrennter
+Nummernraum durch das `RUN`-Wort. Run-IDs werden niemals
+neu vergeben.
+
+**Auslöser**: kurze textliche Beschreibung, was den Run gestartet
+hat — eine User-Spec, ein GitHub-Issue, ein Cron-Trigger.
+
+**Eingesetzte Subagenten**: Liste der Agent-Rollen, die im Run
+aktiv waren (architect, frontend-dev, tester usw.). Gibt Hinweise
+auf Komplexität und Fehlerquellen, wenn etwas nachträglich
+aufgearbeitet werden muss.
+
+**Erzeugte Deltas / ADRs**: Cross-Verweise auf das Delta-Register
+und ADRs, die durch diesen Run entstanden sind. Macht sichtbar,
+wo autonome Entscheidungen die Projekt-Doku verändert haben.
+
+**Ergebnis**: kurze Zusammenfassung, was am Ende rauskam — Merge,
+Pull Request offen, Lauf abgebrochen, etc. Nicht ausführlich.
+
+**Status**: `Aktiv`, `Erledigt`, `Abgebrochen`. Erledigte und
+abgebrochene Runs werden — analog zum Delta-Register — mit
+Strikethrough markiert, nicht gelöscht.
+
+### Detaillierte Run-Logs
+
+Vollständige Schritt-für-Schritt-Logs (jeder Tool-Call, jedes
+Zwischenartefakt, jeder Subagent-Output) gehören **nicht** in
+`08-agent-runs.md`. Sie würden die Datei aufblähen und sind
+maschinenlesbar besser außerhalb des Repos aufgehoben — in einer
+Observability-Plattform, einer Datenbank, einer GitHub-Actions-
+Run-Page. Eine optionale Spalte „Log-Verweis" kann auf solche
+externen Quellen zeigen, wenn Auffindbarkeit der Volldokumentation
+wichtig ist.
+
+`08-agent-runs.md` ist Index und Audit-Trail, nicht
+Volldokumentation.
+
+### Verhältnis zu `00-handover-*.md`
+
+UCDP kennt seit der Anfangsversion die optionalen
+`00-handover-YYYY-MM-DD.md`-Dateien für einmalige menschliche
+Übergaben. Diese bleiben unverändert bestehen — sie sind
+einmalige, abgeschlossene Markdown-Dateien für „ich übergebe das
+Projekt an Kollegen X". `08-agent-runs.md` ist demgegenüber ein
+lebendiges, fortlaufendes Register. Beide Konventionen sind
+komplementär; ein Projekt kann beide gleichzeitig nutzen.
+
+### Auswirkung auf `CLAUDE.md`
+
+Wer `08-agent-runs.md` einsetzt, ergänzt die „Update-Pflicht bei
+jeder Code-Änderung"-Sektion in der projektspezifischen
+`CLAUDE.md` um eine Bullet:
+
+> **Agentischer Run** → Run-Eintrag bei Start in
+> `08-agent-runs.md` anlegen, bei Ende Status auf `Erledigt` (oder
+> `Abgebrochen`) setzen und mit Strikethrough markieren.
+
+Die Vorlage-`CLAUDE.md` im Template-Repo enthält diese Bullet
+bewusst nicht — sie würde das Template für die Mehrzahl der
+Projekte unnötig länger machen.
+
+## 11. Geheimnisse und Secrets
 
 Das Pattern hat eine harte Regel: **Secrets niemals in der Doku.**
 Keine API-Keys, keine Webhook-Secrets, keine Connection-Strings
@@ -460,7 +569,7 @@ verletzt, weil „nur eben kurz zur Doku dazupacken" praktisch ist.
 Es lohnt sich, diese Regel in `CLAUDE.md` explizit zu formulieren
 und vor jedem Commit zu prüfen.
 
-## 11. Anti-Pattern — wie schlecht-praktiziertes UCDP aussieht
+## 12. Anti-Pattern — wie schlecht-praktiziertes UCDP aussieht
 
 Wenn du einen oder mehrere der folgenden Punkte in deinem Repo
 beobachtest, lohnt sich ein bewusstes Aufräumen — sonst verliert
@@ -512,7 +621,14 @@ kurz angepasst, weil veraltet". Damit ist der historische Anker
 verloren. Gegenmittel: `_source/` ist read-only, mental und
 ggf. auch per Pre-Commit-Hook.
 
-## 12. Was UCDP bewusst *nicht* ist
+**Run-Friedhof.** Das Register `08-agent-runs.md` füllt sich mit
+Dutzenden alten Runs ohne Statusbumps oder Strikethrough. Symptom:
+Aktive Runs sind nicht mehr auffindbar, das Register wird
+ignoriert. Gegenmittel: bei Run-Abschluss konsequent Status
+setzen und Strikethrough anwenden; bei dauerhaft hoher Run-Anzahl
+analog zum Delta-Register-Archiv eine Archiv-Datei einführen.
+
+## 13. Was UCDP bewusst *nicht* ist
 
 Das Pattern ist keine vollständige Software-Engineering-Methode.
 Es ersetzt weder Code-Reviews, noch Tests, noch Issue-Tracker,
@@ -527,10 +643,10 @@ als einen Monat lebt, mehrere Code-Sessions über Zeit verteilt
 stattfinden und ein KI-Assistent den Kontext nicht in einer
 einzigen Sitzung im Kopf behalten kann.
 
-## 13. Pattern-Versionierung
+## 14. Pattern-Versionierung
 
-Die Pattern-Konvention selbst entwickelt sich weiter. Aktuelle
-Version: **1.2**. Änderungen werden als Anhang in dieser Datei
+Die Pattern-Konvention selbst entwickelt sich weiter. Aktuelle 
+Version: **1.3**. Änderungen werden als Anhang in dieser Datei
 dokumentiert.
 
 ### Versionshistorie
@@ -546,8 +662,14 @@ dokumentiert.
   die inhaltliche Quelle, `AGENTS.md` ein kurzer Pointer mit
   BEGIN/END-markierten Tool-Sektionen. Abschnitt 7 entsprechend
   umgeschrieben.
+- **1.3** (2026-05-09) — Optionaler Abschnitt 10 „Agentische
+  Runs" eingeführt. Neue optionale Datei `08-agent-runs.md` als
+  Register autonomer Agent-Runs. ID-Konvention
+  `<PRÄFIX>-RUN-NNNN`. Nummerierung 01–06 und 08 sind pattern-
+  reserviert; 07 und 09+ projektspezifisch. Anti-Pattern
+  „Run-Friedhof" ergänzt.
 
-## 14. Abschluss
+## 15. Abschluss
 
 UCDP ist kein abgeschlossenes System, sondern ein in der Praxis
 entstandenes und sich weiterentwickelndes Muster. Wenn du es in

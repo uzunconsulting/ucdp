@@ -19,6 +19,9 @@ für die vollständige Beschreibung der Konvention.
   (Ziel/Ist/Deltas)
 - `05-status.md` — Delta-Register (lebendes Dokument)
 - `06-decisions.md` — ADRs (unveränderlich)
+- `08-agent-runs.md` — Register autonomer Agent-Runs (optional;
+  nur anlegen, wenn das Projekt agentisch gebaut wird, siehe
+  PATTERN.md Abschnitt 10)
 - `_source/` — Historische Originaldokumente (nicht editieren)
 
 ## Konventionen
@@ -26,6 +29,8 @@ für die vollständige Beschreibung der Konvention.
 - **Prioritäten**: P1 (diese Woche) / P2 (dieses Quartal) /
   P3 (nice-to-have)
 - **Delta-IDs**: `<PRÄFIX>-NNN`, fortlaufend, niemals neu vergeben
+- **Run-IDs** (falls `08-agent-runs.md` genutzt wird):
+  `<PRÄFIX>-RUN-NNNN`, fortlaufend, niemals neu vergeben
 - **ADRs**: fortlaufend nummeriert, einmal geschrieben nicht mehr
   editiert; bei Widerruf neues ADR mit `supersedes:`-Verweis
 - **Secrets**: niemals in der Doku, nur Variablennamen
