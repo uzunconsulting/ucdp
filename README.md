@@ -55,6 +55,8 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
 │   ├── 04-deployment.md
 │   ├── 05-status.md
 │   ├── 06-decisions.md
+│   ├── 08-agent-runs.md     ← optional, nur bei agentisch gebauten
+│   │                          Projekten (siehe PATTERN.md §10)
 │   └── _source/             ← historische Originaldokumente
 └── examples/
     └── newsletter-tool/     ← vollständig ausgefülltes Demo
