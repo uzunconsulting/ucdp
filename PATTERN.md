@@ -1,7 +1,7 @@
 ---
 title: Uzun Consulting Documentation Pattern (UCDP)
-version: 1.3
-last_reviewed: 2026-05-09
+version: 1.4
+last_reviewed: 2026-07-14
 author: Mustafa Uzun
 ---
 
@@ -554,7 +554,63 @@ Die Vorlage-`CLAUDE.md` im Template-Repo enthält diese Bullet
 bewusst nicht — sie würde das Template für die Mehrzahl der
 Projekte unnötig länger machen.
 
-## 11. Geheimnisse und Secrets
+## 11. Enforcement-Hooks (optional)
+
+Die bisher beschriebene Disziplin — Leseroutine beim Start, Doku-
+Pflicht nach jeder Änderung, Arbeit nur im eigenen Repo — steht in
+`CLAUDE.md` als **Instruktion**. Eine KI-Session kann eine
+Instruktion aber vergessen, verdrängen oder kreativ auslegen. Wer
+die Disziplin nicht nur *beschreiben*, sondern *erzwingen* will,
+kann sie als **Hooks** hinterlegen: deterministische Kommandos, die
+die Agent-Harness (z. B. Claude Code) selbst an festen Lebenszyklus-
+Punkten ausführt — nicht die KI. Was ein Hook blockt, lässt sich
+nicht wegargumentieren.
+
+Diese Erweiterung ist **optional** und für Projekte gedacht, die mit
+Claude Code (oder einer kompatiblen Hook-fähigen Harness) gebaut
+werden. Ein Referenz-Satz liegt im Template unter `.claude/hooks/`
+samt `.claude/settings.json`; die Details stehen in
+`.claude/hooks/README.md`.
+
+### Die vier Hooks
+
+- **Session-Start-Briefing** (`SessionStart`): injiziert zu
+  Session-Beginn automatisch den aktuellen Stand (Projekt,
+  `last_reviewed`, Branch, uncommittete/ungepushte Änderungen,
+  letzte Commits) und erzwingt die Leseroutine. Feuert auch nach
+  einer Kontext-Kompaktierung, sodass sich die Session in langen
+  Läufen erneut am aktuellen Stand verankert. Ersetzt das händische
+  Einfügen eines „Start"-Prompts.
+- **Projektordner-Grenzwächter** (`PreToolUse`): verweigert
+  Schreibzugriffe außerhalb des eigenen Projektordners. Betrifft
+  eine Änderung ein Nachbarprojekt, erzwingt der Hook einen
+  **Handoff-Prompt** statt eigenmächtiger Edits im fremden Repo —
+  die konsequente Umsetzung der Cross-Projekt-Regel aus Abschnitt 9.
+- **Doku-Nudge** (`PostToolUse`): erinnert einmal pro Session nach
+  der ersten Code-Änderung an die Update-Pflicht.
+- **Doku-Ende-Check** (`Stop`): hält das Session-Ende einmal an,
+  wenn Code geändert, aber unter `docs/` nichts nachgezogen wurde —
+  die maschinelle Absicherung der Update-Pflicht aus Abschnitt 7.
+
+### Prinzipien
+
+- **Fail-open**: jeder unerwartete Fehler im Hook lässt die Aktion
+  durch. Ein Hook darf die Arbeit nie blockieren, nur die
+  *Undiszipliniertheit*.
+- **Self-detecting**: ohne `docs/05-status.md` sind die Doku-Hooks
+  ein No-op — Nicht-UCDP-Ordner bleiben unberührt.
+- **Portabel**: die Skripte lösen sich relativ zum Repo auf
+  (`$env:CLAUDE_PROJECT_DIR`), ohne maschinenspezifische Pfade.
+- **Escapes**: bewusste Ausnahmen über Umgebungsvariablen
+  (`UCDP_UNLOCK` für den Grenzwächter, `UCDP_NODOC` für den
+  Ende-Check), gesetzt vor dem Start der Session.
+
+Die Hooks sind bewusst kein Teil des Doku-*Kerns*: UCDP funktioniert
+auch ohne sie. Sie sind die Antwort auf die Frage „wie halte ich
+eine KI-Session zuverlässig bei der Konvention", wenn Erinnerung
+allein nicht reicht.
+
+## 12. Geheimnisse und Secrets
 
 Das Pattern hat eine harte Regel: **Secrets niemals in der Doku.**
 Keine API-Keys, keine Webhook-Secrets, keine Connection-Strings
@@ -569,7 +625,7 @@ verletzt, weil „nur eben kurz zur Doku dazupacken" praktisch ist.
 Es lohnt sich, diese Regel in `CLAUDE.md` explizit zu formulieren
 und vor jedem Commit zu prüfen.
 
-## 12. Anti-Pattern — wie schlecht-praktiziertes UCDP aussieht
+## 13. Anti-Pattern — wie schlecht-praktiziertes UCDP aussieht
 
 Wenn du einen oder mehrere der folgenden Punkte in deinem Repo
 beobachtest, lohnt sich ein bewusstes Aufräumen — sonst verliert
@@ -628,7 +684,7 @@ ignoriert. Gegenmittel: bei Run-Abschluss konsequent Status
 setzen und Strikethrough anwenden; bei dauerhaft hoher Run-Anzahl
 analog zum Delta-Register-Archiv eine Archiv-Datei einführen.
 
-## 13. Was UCDP bewusst *nicht* ist
+## 14. Was UCDP bewusst *nicht* ist
 
 Das Pattern ist keine vollständige Software-Engineering-Methode.
 Es ersetzt weder Code-Reviews, noch Tests, noch Issue-Tracker,
@@ -643,10 +699,10 @@ als einen Monat lebt, mehrere Code-Sessions über Zeit verteilt
 stattfinden und ein KI-Assistent den Kontext nicht in einer
 einzigen Sitzung im Kopf behalten kann.
 
-## 14. Pattern-Versionierung
+## 15. Pattern-Versionierung
 
 Die Pattern-Konvention selbst entwickelt sich weiter. Aktuelle 
-Version: **1.3**. Änderungen werden als Anhang in dieser Datei
+Version: **1.4**. Änderungen werden als Anhang in dieser Datei
 dokumentiert.
 
 ### Versionshistorie
@@ -668,8 +724,15 @@ dokumentiert.
   `<PRÄFIX>-RUN-NNNN`. Nummerierung 01–06 und 08 sind pattern-
   reserviert; 07 und 09+ projektspezifisch. Anti-Pattern
   „Run-Friedhof" ergänzt.
+- **1.4** (2026-07-14) — Optionaler Abschnitt 11 „Enforcement-
+  Hooks" eingeführt: die Session-Disziplin lässt sich maschinell
+  erzwingen (SessionStart-Briefing, Projektordner-Grenzwächter,
+  Doku-Nudge, Doku-Ende-Check). Referenz-Implementierung im
+  Template unter `.claude/hooks/` + `.claude/settings.json`.
+  Optional, fail-open, self-detecting; Nicht-Hook-Harnesses
+  ignorieren `.claude/` folgenlos.
 
-## 15. Abschluss
+## 16. Abschluss
 
 UCDP ist kein abgeschlossenes System, sondern ein in der Praxis
 entstandenes und sich weiterentwickelndes Muster. Wenn du es in

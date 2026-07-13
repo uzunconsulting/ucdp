@@ -40,6 +40,13 @@ Der Code unter `<code-pfade>` ist Single Source of Truth für die
 Implementierung. Bei Widerspruch zwischen Code und Doku siehe
 Sektion „Wenn Doku und Code widersprechen" am Ende.
 
+> **Optionale maschinelle Absicherung.** Liegt im Repo ein
+> `.claude/hooks/`-Satz (UCDP Enforcement-Hooks, `PATTERN.md` §11),
+> erzwingt die Harness Leseroutine, Doku-Pflicht und die Grenze
+> „nur im eigenen Projektordner arbeiten" — unabhängig von dieser
+> Instruktion. Bewusste Ausnahmen: `UCDP_UNLOCK` / `UCDP_NODOC`.
+> Diese Sektion (und `.claude/`) entfernen, falls ungenutzt.
+
 ## Doku-Struktur
 
 ```

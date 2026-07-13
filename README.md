@@ -47,6 +47,9 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
 ├── CLAUDE.md                ← Session-Disziplin (Quelle, projektspezifisch)
 ├── AGENTS.md                ← Pointer auf CLAUDE.md (Tool-Konvention)
 ├── .gitignore               ← Standard für Web-Projekte
+├── .claude/                 ← optionale Enforcement-Hooks (Claude Code):
+│   ├── settings.json          erzwingt die Session-Disziplin maschinell
+│   └── hooks/                 (siehe PATTERN.md §11); löschbar, falls ungenutzt
 ├── docs/                    ← Skelett der Projektdokumentation
 │   ├── README.md
 │   ├── 01-concept.md
@@ -76,10 +79,14 @@ CC-BY-4.0 — frei nutzbar mit Quellenangabe. Siehe `LICENSE`.
 
 ## Pattern-Versionierung
 
-Aktuelle UCDP-Version: **1.3** (siehe `PATTERN.md` Frontmatter).
-v1.3 hat eine optionale Erweiterung für agentisch gebaute
-Projekte ergänzt (`08-agent-runs.md`); Projekte ohne agentische
-Runs nutzen UCDP unverändert weiter.
+Aktuelle UCDP-Version: **1.4** (siehe `PATTERN.md` Frontmatter).
+v1.4 hat eine optionale Erweiterung ergänzt: **Enforcement-Hooks**
+(`.claude/hooks/` + `.claude/settings.json`), die die Session-
+Disziplin maschinell erzwingen statt sie nur zu beschreiben (siehe
+`PATTERN.md` §11). Projekte, die keine Hook-fähige Harness nutzen,
+löschen den `.claude/`-Ordner folgenlos. v1.3 hatte zuvor die
+optionale Datei `08-agent-runs.md` für agentisch gebaute Projekte
+eingeführt.
 
 Änderungen am Pattern selbst werden in `PATTERN.md` dokumentiert.
 Projekte, die auf einer älteren Version aufgesetzt wurden,

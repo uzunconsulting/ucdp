@@ -1,0 +1,66 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-session-start.ps1')",
+            "timeout": 20,
+            "statusMessage": "UCDP: aktuellen Stand laden"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-guard.ps1')",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-guard.ps1')",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-postedit-nudge.ps1')",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-doc-check.ps1')",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}
