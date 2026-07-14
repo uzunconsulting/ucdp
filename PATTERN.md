@@ -586,6 +586,10 @@ samt `.claude/settings.json`; die Details stehen in
   eine Änderung ein Nachbarprojekt, erzwingt der Hook einen
   **Handoff-Prompt** statt eigenmächtiger Edits im fremden Repo —
   die konsequente Umsetzung der Cross-Projekt-Regel aus Abschnitt 9.
+  Gehören mehrere Repos bewusst zusammen (gemeinsamer Dach-Ordner),
+  hebt eine Datei `.ucdp-workspace` im Dach-Ordner die Grenze für
+  genau diesen Umbrella auf — die Sub-Repos werden gegenseitig
+  beschreibbar, alles außerhalb bleibt blockiert.
 - **Doku-Nudge** (`PostToolUse`): erinnert einmal pro Session nach
   der ersten Code-Änderung an die Update-Pflicht.
 - **Doku-Ende-Check** (`Stop`): hält das Session-Ende einmal an,
@@ -730,7 +734,9 @@ dokumentiert.
   Doku-Nudge, Doku-Ende-Check). Referenz-Implementierung im
   Template unter `.claude/hooks/` + `.claude/settings.json`.
   Optional, fail-open, self-detecting; Nicht-Hook-Harnesses
-  ignorieren `.claude/` folgenlos.
+  ignorieren `.claude/` folgenlos. Grenzwächter mit optionalem
+  Workspace-Umbrella (`.ucdp-workspace`) für bewusst zusammen-
+  gehörende Repos unter einem Dach-Ordner.
 
 ## 16. Abschluss
 

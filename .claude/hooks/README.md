@@ -27,6 +27,19 @@ SessionStart, Nudge und Doc-Check ein No-op. Die Skripte sind **portabel**
   `pushd` bzw. `git -C` in fremde Pfade in Verbindung mit einer Schreib-/
   Commit-Absicht. Reine Lesezugriffe auf Nachbarprojekte bleiben erlaubt.
 
+## Workspace-Umbrella (`.ucdp-workspace`)
+
+Gehören mehrere Repos zusammen und sollen sich gegenseitig beschreiben dürfen
+(z. B. mehrere Sub-Repos unter einem gemeinsamen Hauptordner), lege im Dach-
+Ordner eine leere Datei **`.ucdp-workspace`** ab. Der Grenzwächter sucht sie
+vom Projektordner aufwärts; wird sie gefunden, gilt der gesamte Dach-Ordner als
+ein zusammenhängender Schreib-Bereich — alle Unterprojekte darunter sind
+gegenseitig beschreibbar, alles außerhalb bleibt blockiert. Funktioniert egal,
+ob die Session im Umbrella oder in einem Sub-Repo startet.
+
+> Den Marker beim **Dach-Ordner** ablegen, nicht bei einem Wurzelordner wie
+> `C:\Projekte` — dort würde er den Schutz für alle Projekte aushebeln.
+
 ## Escape-Schalter (bewusste Ausnahmen)
 
 Im Terminal **vor** dem Start von `claude` setzen:

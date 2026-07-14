@@ -1,7 +1,15 @@
 # UCDP Projektordner-Grenzwaechter (PreToolUse) - portabel, kein hartkodierter Pfad.
-# Erlaubt Schreiben NUR im eigenen Projektordner (+ Temp + ~/.claude). Alles andere -> deny.
-# Write/Edit/NotebookEdit: harte Sperre. Bash: heuristisch (cd/Set-Location/pushd + git -C in fremde Pfade,
-# nur wenn zugleich eine Schreib-/Commit-Absicht erkennbar ist). Reads bleiben erlaubt.
+# Erlaubt Schreiben NUR im eigenen Projektordner (+ Temp + ~/.claude + optionalem
+# Workspace-Umbrella). Alles andere -> deny.
+# Write/Edit/NotebookEdit: harte Sperre. Bash: heuristisch (cd/Set-Location/pushd + git -C in
+# fremde Pfade, nur wenn zugleich eine Schreib-/Commit-Absicht erkennbar ist). Reads bleiben erlaubt.
+#
+# Workspace-Umbrella: Liegt in einem Vorfahren-Ordner eine Datei ".ucdp-workspace", gilt dieser
+# Dach-Ordner als gemeinsamer Schreib-Bereich (z.B. mehrere zusammengehoerige Repos unter einem
+# Hauptordner). Alle Unterprojekte darunter werden gegenseitig beschreibbar; alles ausserhalb bleibt
+# blockiert. Marker beim Dach-Ordner ablegen - NICHT bei einem Wurzelordner wie C:\Projekte (das
+# wuerde den Schutz global aushebeln).
+#
 # Escape: $env:UCDP_UNLOCK=1 vor dem Start von claude. Fail-open bei jedem Fehler.
 $ErrorActionPreference = 'Stop'
 try {
@@ -38,6 +46,17 @@ if ($env:TEMP) { $allow += (Norm $env:TEMP) }
 if ($env:TMP)  { $allow += (Norm $env:TMP) }
 $prof = if ($env:USERPROFILE) { $env:USERPROFILE } elseif ($HOME) { $HOME } else { $null }
 if ($prof) { $allow += (Norm (Join-Path $prof '.claude')) }
+
+# Optionaler Workspace-Umbrella: naechsten .ucdp-workspace-Marker aufwaerts suchen.
+$cur = Norm $projectDir
+$depth = 0
+while ($cur -and $depth -lt 8) {
+  if (Test-Path -LiteralPath (Join-Path $cur '.ucdp-workspace')) { $allow += $cur; break }
+  $parent = [System.IO.Path]::GetDirectoryName($cur)
+  if (-not $parent -or $parent -eq $cur) { break }
+  $cur = $parent; $depth++
+}
+
 $allow = $allow | Where-Object { $_ } | Select-Object -Unique
 
 function IsOffending([string]$n) {
@@ -52,7 +71,8 @@ UCDP-Grenzwaechter: Schreiben AUSSERHALB des eigenen Projektordners wurde blocki
   Ziel : $path
   Aktiv: $projectDir
 
-Regel: Diese Session schreibt nur im eigenen Projektordner (plus Temp/Memory). Arbeite nicht in einem anderen Projekt.
+Regel: Diese Session schreibt nur im eigenen Projektordner (plus Temp/Memory bzw. einem per
+.ucdp-workspace markierten Umbrella). Arbeite nicht in einem fremden Projekt.
 Ist ein Nachbarprojekt betroffen: erzeuge einen Handoff-Prompt (Uebergabe + konkretes To-do) fuer dessen
 EIGENE Claude-Code-Session, statt selbst dort zu schreiben.
 Bewusste Ausnahme: Session mit  `$env:UCDP_UNLOCK=1  neu starten.
