@@ -1,0 +1,98 @@
+#!/bin/sh
+# UCDP pre-commit (optional, ab v1.5)
+#
+# Aktivieren pro Klon:   git config core.hooksPath .githooks
+#
+# Deckt einen anderen Moment ab als die Claude-Code-Hooks unter .claude/hooks/:
+# den COMMIT statt die Session. Wirkt damit auch beim Handcommit, bei anderen
+# Assistenten und wenn die Session-Hooks nicht aktiv sind.
+#
+# Linie: BLOCKEN nur, was unwiederbringlich oder gefaehrlich ist (Secrets, .env).
+#        WARNEN, was undiszipliniert ist (Code ohne docs/). Ein Doku-Zwang pro
+#        Commit haette die falsche Granularitaet - UCDPs Doku-Pflicht haengt an
+#        der Arbeitseinheit, nicht am einzelnen Commit, und erzeugt sonst
+#        Alibi-Eintraege.
+#
+# Notausgang:  UCDP_SKIP_SECRETS=1 git commit ...   oder  git commit --no-verify
+
+set -u
+RED=''; YEL=''; NC=''
+if [ -t 2 ]; then RED='\033[31m'; YEL='\033[33m'; NC='\033[0m'; fi
+fail=0
+
+# ---------------------------------------------------------------------------
+# 1. BLOCK: gestagte .env-Dateien
+# ---------------------------------------------------------------------------
+envfiles=$(git diff --cached --name-only --diff-filter=ACMR \
+  | grep -E '(^|/)\.env($|\.)' \
+  | grep -vE '\.(example|sample|template|dist)$' || true)
+
+if [ -n "$envfiles" ]; then
+  printf "${RED}UCDP pre-commit: .env-Datei(en) im Commit.${NC}\n" >&2
+  printf '%s\n' "$envfiles" | sed 's/^/  - /' >&2
+  printf '  In .env gehoeren Werte, ins Repo nur Variablennamen (PATTERN.md, Abschnitt Secrets).\n' >&2
+  printf '  Loesen:  git restore --staged <datei>   und den Namen in .gitignore aufnehmen.\n' >&2
+  fail=1
+fi
+
+# ---------------------------------------------------------------------------
+# 2. BLOCK: bekannte Secret-Muster in hinzugefuegten Zeilen
+#    .githooks/ ist ausgenommen - sonst blockt dieser Hook seinen eigenen Commit.
+# ---------------------------------------------------------------------------
+if [ "${UCDP_SKIP_SECRETS:-0}" != "1" ]; then
+  added=$(git diff --cached -U0 --diff-filter=ACM -- . ':(exclude).githooks/*' 2>/dev/null \
+          | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+
+  # Anbieter-spezifisch, sehr niedrige Falsch-Positiv-Rate.
+  hard='sk-ant-[A-Za-z0-9_-]{16,}|sk-[A-Za-z0-9]{32,}|AKIA[0-9A-Z]{16}'
+  hard="$hard|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{20,}"
+  hard="$hard|xox[abprs]-[A-Za-z0-9-]{10,}|glpat-[A-Za-z0-9_-]{16,}"
+  hard="$hard|AIza[0-9A-Za-z_-]{35}"
+  hard="$hard|-----BEGIN [A-Z ]*PRIVATE KEY-----"
+  hard="$hard|eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\."
+
+  hits=$(printf '%s\n' "$added" | grep -nE "$hard" || true)
+  if [ -n "$hits" ]; then
+    printf "${RED}UCDP pre-commit: Secret-Muster in hinzugefuegten Zeilen.${NC}\n" >&2
+    printf '%s\n' "$hits" | cut -c1-160 | sed 's/^/  /' >&2
+    printf '  Ist es ein echtes Geheimnis: aus dem Diff nehmen, Wert rotieren, in .env legen.\n' >&2
+    printf '  Ist es ein Fehlalarm:  UCDP_SKIP_SECRETS=1 git commit ...\n' >&2
+    fail=1
+  fi
+
+  # Generische Zuweisungen: nur Hinweis, zu viele legitime Treffer fuer einen Block.
+  soft='(api[_-]?key|secret|passwo?r?d|token|credential)[[:space:]]*[:=][[:space:]]*["'"'"'][^"'"'"']{16,}'
+  softhits=$(printf '%s\n' "$added" | grep -inE "$soft" || true)
+  if [ -n "$softhits" ]; then
+    printf "${YEL}UCDP pre-commit (Hinweis): sieht nach einer Zugangsdaten-Zuweisung aus.${NC}\n" >&2
+    printf '%s\n' "$softhits" | head -5 | cut -c1-160 | sed 's/^/  /' >&2
+    printf '  Kurz pruefen. Der Commit laeuft weiter.\n' >&2
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# 3. WARNUNG (nicht blockierend): Code gestagt, docs/ unberuehrt
+# ---------------------------------------------------------------------------
+if [ -f docs/05-status.md ]; then
+  staged=$(git diff --cached --name-only --diff-filter=ACMR || true)
+  docs_touched=0
+  code_hit=''
+  for f in $staged; do
+    case "$f" in
+      docs/*|*/docs/*) docs_touched=1; continue ;;
+      *node_modules/*|*/dist/*|*/build/*|*/.next/*|*package-lock.json|*pnpm-lock.yaml|*yarn.lock|*.lock) continue ;;
+    esac
+    case "$f" in
+      *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.py|*.rb|*.php|*.java|*.kt|*.go|*.rs|*.swift|*.dart|*.cs|*.c|*.cc|*.cpp|*.h|*.sh|*.ps1|*.sql|*.prisma|*.graphql|*.proto|*.css|*.scss|*.vue|*.svelte|*.astro|*.html|*.json|*.yml|*.yaml|*.toml|*.tf|Dockerfile|Makefile)
+        [ -z "$code_hit" ] && code_hit="$f" ;;
+    esac
+  done
+  if [ -n "$code_hit" ] && [ "$docs_touched" -eq 0 ]; then
+    printf "${YEL}UCDP pre-commit (Hinweis): Code gestagt (z. B. %s), docs/ unberuehrt.${NC}\n" "$code_hit" >&2
+    printf '  Faellig ist meist: ## Ist der Topic-Datei, docs/05-status.md (Delta), last_reviewed bumpen.\n' >&2
+    printf '  Reiner Refactor: last_reviewed genuegt. Dieser Commit wird NICHT blockiert.\n' >&2
+  fi
+fi
+
+[ "$fail" -eq 0 ] || exit 1
+exit 0

@@ -1,4 +1,25 @@
+# Lizenz des UCDP-*Patterns*
+
 Copyright (c) 2026 Mustafa Uzun / Uzun Consulting
+
+Diese Lizenz gilt für das **Uzun Consulting Documentation Pattern** selbst —
+also für `PATTERN.md`, die Skelett-Dateien unter `docs/`, `CLAUDE.md`,
+`AGENTS.md`, die Hooks unter `.claude/` und `.githooks/` sowie das Beispiel
+unter `examples/`.
+
+**Sie gilt ausdrücklich NICHT für Projekte, die aus diesem Template entstehen.**
+Der Code und die Inhalte deines Projekts gehören dir und tragen die Lizenz, die
+du dafür wählst (oder gar keine, bei proprietären Repos).
+
+Deshalb heißt diese Datei nicht `LICENSE`: eine Datei mit diesem Namen im
+Wurzelverzeichnis würde von GitHub als Lizenz *deines* Projekts erkannt und
+angezeigt — und damit versehentlich CC-BY auf deine Geschäftslogik legen. Lege
+deine eigene `LICENSE` an, wenn dein Projekt eine braucht.
+
+Nutzt du das Pattern selbst weiter (Weitergabe, Veröffentlichung, abgeleitete
+Fassungen), gilt die folgende Lizenz mit Namensnennung:
+
+---
 
 This work is licensed under the Creative Commons Attribution 4.0
 International License. The full legal text follows below.

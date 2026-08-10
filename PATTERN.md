@@ -1,7 +1,7 @@
 ---
 title: Uzun Consulting Documentation Pattern (UCDP)
-version: 1.4
-last_reviewed: 2026-07-14
+version: 1.5
+last_reviewed: 2026-08-10
 author: Mustafa Uzun
 ---
 
@@ -106,6 +106,32 @@ unterschiedliche Aufgaben:
 
 Beide sollen kurz sein. Inhalte werden nicht doppelt geführt;
 die Root-README verweist bei Bedarf auf `docs/`.
+
+### Verhältnis zu `CHANGELOG.md`
+
+`CHANGELOG.md` und `docs/` beantworten verschiedene Fragen und
+ersetzen einander nicht:
+
+- **`CHANGELOG.md`** — *was wurde wann geändert*. Chronologisch,
+  nach außen gerichtet, wächst am Ende, wird nie umgeschrieben.
+- **`docs/02`–`04`** — *was ist es und wie funktioniert es heute*.
+  Zustandsbeschreibend; der `## Ist`-Abschnitt wird überschrieben,
+  nicht fortgeschrieben.
+- **`docs/05-status.md`** — die Brücke: *was fehlt noch*. Offene
+  Arbeit mit IDs.
+- **`docs/06-decisions.md`** — *warum es so ist*. Begründungen,
+  die einen CHANGELOG-Eintrag überdauern.
+
+Die Verwechslung, die in der Praxis am häufigsten vorkommt: ein
+CHANGELOG-Eintrag wird geschrieben und der `## Ist`-Abschnitt
+bleibt stehen wie er war. Danach beschreibt die Doku einen Stand,
+den es nicht mehr gibt — das Anti-Pattern „Veraltete
+`## Ist`-Sektionen" aus Abschnitt 13. Ein CHANGELOG-Eintrag
+ersetzt **nie** einen Delta-Eintrag oder ein ADR.
+
+`CHANGELOG.md` ist optional. Projekte ohne Releases nach außen
+kommen mit `git log` und `05-status.md` aus. Das Template liefert
+ein Gerüst mit; wer es nicht braucht, löscht es.
 
 ## 3. Topic-Dateien: Innerer Aufbau
 
@@ -572,7 +598,7 @@ werden. Ein Referenz-Satz liegt im Template unter `.claude/hooks/`
 samt `.claude/settings.json`; die Details stehen in
 `.claude/hooks/README.md`.
 
-### Die vier Hooks
+### Die fünf Hooks
 
 - **Session-Start-Briefing** (`SessionStart`): injiziert zu
   Session-Beginn automatisch den aktuellen Stand (Projekt,
@@ -590,11 +616,19 @@ samt `.claude/settings.json`; die Details stehen in
   hebt eine Datei `.ucdp-workspace` im Dach-Ordner die Grenze für
   genau diesen Umbrella auf — die Sub-Repos werden gegenseitig
   beschreibbar, alles außerhalb bleibt blockiert.
+- **Überschreibschutz** (`PreToolUse`, seit 1.5): verweigert das
+  Überschreiben einer bestehenden Datei, die **nicht aus Git
+  wiederherstellbar** ist — ungetrackt, oder der Ordner steht
+  überhaupt nicht unter Versionskontrolle. Getrackte Dateien
+  bleiben frei überschreibbar; die holt `git checkout` zurück.
+  Begründung siehe unten, „Warum ein eigener Überschreibschutz".
 - **Doku-Nudge** (`PostToolUse`): erinnert einmal pro Session nach
   der ersten Code-Änderung an die Update-Pflicht.
 - **Doku-Ende-Check** (`Stop`): hält das Session-Ende einmal an,
   wenn Code geändert, aber unter `docs/` nichts nachgezogen wurde —
   die maschinelle Absicherung der Update-Pflicht aus Abschnitt 7.
+  Als „Doku nachgezogen" zählt ausschließlich eine Änderung unter
+  `docs/`.
 
 ### Prinzipien
 
@@ -606,13 +640,121 @@ samt `.claude/settings.json`; die Details stehen in
 - **Portabel**: die Skripte lösen sich relativ zum Repo auf
   (`$env:CLAUDE_PROJECT_DIR`), ohne maschinenspezifische Pfade.
 - **Escapes**: bewusste Ausnahmen über Umgebungsvariablen
-  (`UCDP_UNLOCK` für den Grenzwächter, `UCDP_NODOC` für den
-  Ende-Check), gesetzt vor dem Start der Session.
+  (`UCDP_UNLOCK` für den Grenzwächter, `UCDP_ALLOW_OVERWRITE` für
+  den Überschreibschutz, `UCDP_NODOC` für den Ende-Check), gesetzt
+  vor dem Start der Session.
 
 Die Hooks sind bewusst kein Teil des Doku-*Kerns*: UCDP funktioniert
 auch ohne sie. Sie sind die Antwort auf die Frage „wie halte ich
 eine KI-Session zuverlässig bei der Konvention", wenn Erinnerung
 allein nicht reicht.
+
+### Warum ein eigener Überschreibschutz
+
+Der naheliegende Einwand: Claude Code verweigert doch bereits das
+Überschreiben einer Datei, die in dieser Session nicht gelesen
+wurde. Das stimmt — greift aber an einer anderen Stelle. Die
+Harness prüft **Kenntnis**, der Hook prüft **Wiederherstellbarkeit**.
+Drei Fälle bleiben ohne ihn offen:
+
+- **Lesen, dann überschreiben.** Von der Harness erlaubt, und für
+  ungetrackte Arbeit genauso endgültig.
+- **Der Shell-Pfad.** `> datei`, `Set-Content`, `cp`, `mv` laufen
+  an der Write-Prüfung vorbei.
+- **Andere Werkzeuge.** Ein zweiter Assistent, ein Skript, ein
+  Headless-Run kennt die Regel nicht.
+
+Der teuerste Moment eines Projekts ist die Frühphase: viel
+entsteht, wenig ist committet, und parallel laufende Agenten
+schreiben in denselben Ordner. Genau dort greift der Hook am
+härtesten — in einem Ordner ohne Git ist danach *jedes*
+Überschreiben blockiert, bis entweder gelesen, committet oder
+bewusst gelöscht wurde. Das ist beabsichtigt und der Grund, warum
+es den Escape `UCDP_ALLOW_OVERWRITE` gibt.
+
+### Projektspezifische Konfiguration (`.claude/ucdp.config.json`)
+
+Welche Dateiart in einem Projekt die tragende ist, weiß nur das
+Projekt. In einem Next.js-Repo ist es `.tsx`, in einem
+Infrastruktur-Repo `.tf`, in einem regelgetriebenen Produkt eine
+`.json` mit dem Zustandsautomaten. Die optionale, **committete**
+Datei `.claude/ucdp.config.json` erweitert oder kürzt die
+Klassifikation:
+
+```json
+{
+  "codeExtsAdd":  [".rules"],
+  "codeExtsRemove": [".css"],
+  "codeNamesAdd": ["Tiltfile"],
+  "excludeAdd":   ["src/generated/*"],
+  "docPathsAdd":  []
+}
+```
+
+Sie gehört ins Repo, nicht in eine Umgebungsvariable: es ist eine
+Eigenschaft des Projekts, nicht der Maschine, und muss mit dem
+Klon mitwandern. Ohne sie gelten die Defaults; bei kaputtem JSON
+fallen die Hooks stillschweigend auf die Defaults zurück.
+
+Die Defaults zählen bewusst auch Konfiguration-als-Daten
+(`.json`, `.yml`, `.toml`, `.tf`, `.xml`) als Code — dort steckt
+oft mehr Produktverhalten als in einer Komponente. Lockfiles,
+Build-Ordner und generierte Artefakte sind ausgenommen, weil ein
+Hook, der bei jedem `package-lock.json` anschlägt, nach einer
+Woche abgeschaltet wird.
+
+### Grenze: die Session muss im Projektordner starten
+
+Wird `claude` eine Ebene **oberhalb** des Projekts gestartet,
+greifen die Hooks nicht wie gedacht:
+
+- Bei **repo-lokaler** Installation wird `.claude/settings.json`
+  des Projekts gar nicht geladen — es feuert kein einziger Hook.
+  Das ist von innen nicht reparierbar.
+- Bei **globaler** Installation (`~/.claude`) feuern sie, finden
+  aber kein `docs/05-status.md`: die Doku-Hooks sind ein No-op,
+  und der Grenzwächter nimmt den Elternordner als erlaubte
+  Schreib-Wurzel — die Projektgrenze ist praktisch aufgehoben.
+
+Seit 1.5 erkennt das Session-Start-Briefing diesen Fall (kein
+`docs/05-status.md` hier, aber eines darunter) und warnt laut,
+statt still wirkungslos zu bleiben. Die Regel bleibt trotzdem:
+**eine Session pro Projektordner, gestartet im Projektordner.**
+
+### Git-Hooks (`.githooks/`) — der andere Moment
+
+Die Hooks oben greifen während einer Claude-Code-Session. Wer von
+Hand committet, mit einem anderen Assistenten arbeitet oder die
+Session-Hooks nicht aktiviert hat, ist von ihnen nicht erfasst.
+Es gibt auch eine Lücke *innerhalb* von Claude Code: der
+Doku-Ende-Check wertet den Arbeitsbaum aus und steigt aus, wenn
+`git status` sauber ist — wer committet und dann die Session
+beendet, umgeht ihn.
+
+Der optionale Satz unter `.githooks/` schließt diesen Moment,
+werkzeugunabhängig. Aktivierung pro Klon:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Die Aufteilung folgt einer klaren Linie:
+
+- **Blockiert** wird nur, was unwiederbringlich oder gefährlich
+  ist: gestagte `.env`-Dateien und bekannte Secret-Muster im
+  Diff. Ein einmal gepushtes Geheimnis ist verbrannt, auch wenn
+  der Commit später verschwindet. Das setzt um, was Abschnitt 12
+  ohnehin fordert und Abschnitt 13 als Gegenmittel benennt.
+- **Gewarnt** wird bei Code-Änderungen ohne `docs/`-Nachzug — im
+  `pre-commit` und noch einmal deutlicher im `pre-push`.
+
+Bewusst **nicht** erzwungen wird ein Doku- oder CHANGELOG-Eintrag
+pro Commit. Das wäre die falsche Granularität: UCDPs Doku-Pflicht
+hängt an der Arbeitseinheit, nicht am einzelnen Commit. Erzwungen
+produziert sie Alibi-Zeilen — und ein Delta-Register voller
+Alibi-Zeilen ist wertloser als eines mit einer ehrlichen Lücke.
+Der harte Doku-Stopp bleibt beim Session-Ende-Check, wo die
+Arbeitseinheit tatsächlich endet.
 
 ## 12. Geheimnisse und Secrets
 
@@ -706,7 +848,7 @@ einzigen Sitzung im Kopf behalten kann.
 ## 15. Pattern-Versionierung
 
 Die Pattern-Konvention selbst entwickelt sich weiter. Aktuelle 
-Version: **1.4**. Änderungen werden als Anhang in dieser Datei
+Version: **1.5**. Änderungen werden als Anhang in dieser Datei
 dokumentiert.
 
 ### Versionshistorie
@@ -737,6 +879,79 @@ dokumentiert.
   ignorieren `.claude/` folgenlos. Grenzwächter mit optionalem
   Workspace-Umbrella (`.ucdp-workspace`) für bewusst zusammen-
   gehörende Repos unter einem Dach-Ordner.
+- **1.5** (2026-08-10) — Härtung der Enforcement-Schicht aus 1.4,
+  aus dem Einsatz in mehreren Folgeprojekten:
+  - **Überschreibschutz** als fünfter Hook: bestehende, nicht aus
+    Git wiederherstellbare Dateien sind gegen Überschreiben
+    gesperrt (Abschnitt 11).
+  - **Eine Code-Klassifikation statt zweier.** Nudge und
+    Ende-Check teilen sich `ucdp-lib.ps1`; die Listen waren in
+    1.4 bereits auseinandergelaufen. Konfiguration-als-Daten
+    (`.json`, `.yml`, `.toml`, `.tf` …) zählt jetzt als Code,
+    Lockfiles und Build-Artefakte sind ausgenommen.
+  - **Projektspezifische Konfiguration** `.claude/ucdp.config.json`.
+  - **Doku-Pflicht präzisiert**: nur Änderungen unter `docs/`
+    quittieren sie. In 1.4 genügte jede beliebige `.md` im Repo.
+  - **Warnung bei falschem Startordner** im Session-Start-Briefing.
+  - **Grenzwächter versteht Git-Bash-Pfade** (`/c/…`,
+    `/cygdrive/c/…`). Bis 1.4 wurde `/c/projekt` unter Windows zu
+    `C:\c\projekt` normalisiert — der Hook blockierte damit den
+    **eigenen** Projektordner, sobald ein Bash-Kommando ihn in
+    MSYS-Schreibweise ansprach.
+  - **Optionale Git-Hooks** unter `.githooks/`: Secret-/`.env`-Block
+    beim Commit, Doku-Warnung bei Commit und Push.
+  - **Pattern-Lizenz** von `LICENSE` nach `PATTERN-LICENSE.md`
+    verschoben, damit sie nicht als Lizenz des Folgeprojekts
+    erkannt wird.
+  - **`CHANGELOG.md`-Gerüst** plus Abgrenzung zu `docs/`
+    (Abschnitt 2).
+  - `.gitignore` deckt `.claude/settings.local.json` ab.
+
+### Migration von 1.4 auf 1.5
+
+Bestehende 1.4-Projekte bleiben gültig. Wer nachziehen will,
+sortiert nach Dringlichkeit:
+
+**Sofort, unabhängig von allem anderen** — eine Zeile, verhindert
+einen committeten Schlüssel:
+
+```gitignore
+.claude/settings.local.json
+.claude/launch.json
+.claude/*.local.json
+```
+
+Ist die Datei bereits getrackt, reicht `.gitignore` nicht:
+
+```bash
+git rm --cached .claude/settings.local.json
+```
+
+Steckt in der Historie schon ein echter Schlüssel, ist er
+verbrannt — rotieren, nicht nur löschen.
+
+**Dringend, wenn das Projekt noch jung ist** (viel ungetrackte
+Arbeit, mehrere Agenten): `.claude/hooks/ucdp-overwrite-guard.ps1`
+kopieren und in `.claude/settings.json` als `PreToolUse` mit
+Matcher `Write|NotebookEdit|Bash` eintragen.
+
+**Empfohlen**: `ucdp-lib.ps1` kopieren und `ucdp-doc-check.ps1`,
+`ucdp-postedit-nudge.ps1` sowie `ucdp-guard.ps1` durch die
+1.5-Fassungen ersetzen. Ohne das prüft der Ende-Check `.json`/`.yml`
+nicht, lässt jede beliebige `.md` als Doku-Nachweis durchgehen, und
+der Grenzwächter blockiert unter Windows gelegentlich den eigenen
+Ordner (Git-Bash-Pfade).
+
+**Optional**: `.githooks/`, `CHANGELOG.md`, `.gitattributes`,
+`.claude/ucdp.config.json`. Keines davon ist Voraussetzung für
+die übrigen Punkte.
+
+**Nur bei öffentlichen oder fremdgenutzten Repos**: prüfen, ob
+eine aus dem Template mitkopierte CC-BY-`LICENSE` im Root liegt,
+die nicht gemeint ist.
+
+Nichts davon berührt `docs/`. Die Struktur 01–06/08, das
+Delta-Register und die ADRs sind zwischen 1.4 und 1.5 unverändert.
 
 ## 16. Abschluss
 
@@ -751,3 +966,10 @@ KI-Assistenten das nötige Rüstzeug an die Hand geben**. Der Rest
 ist Geschmacksfrage und projektabhängig.
 
 Viel Erfolg beim Einsatz.
+
+---
+
+*Dieses Pattern steht unter CC-BY-4.0 — siehe
+[`PATTERN-LICENSE.md`](./PATTERN-LICENSE.md). Die Lizenz gilt für
+das Pattern, **nicht** für Projekte, die daraus entstehen: dein
+Code gehört dir und trägt die Lizenz, die du dafür wählst.*

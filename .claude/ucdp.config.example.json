@@ -1,0 +1,26 @@
+{
+  "_hinweis": [
+    "Optionale Projekt-Konfiguration fuer die UCDP-Hooks (ab v1.5).",
+    "Zum Aktivieren nach '.claude/ucdp.config.json' kopieren und anpassen.",
+    "Ohne diese Datei gelten die Defaults aus .claude/hooks/ucdp-lib.ps1.",
+    "Die Datei gehoert INS Repo (committen) - sie beschreibt das Projekt, nicht die Maschine.",
+    "Bei kaputtem JSON fallen die Hooks stillschweigend auf die Defaults zurueck.",
+    "Alle Muster gelten gegen den projekt-relativen Pfad mit Forward-Slashes, case-insensitiv.",
+    "Wildcards: * und ?  ('**/' wird wie '*' behandelt)"
+  ],
+
+  "_codeExtsAdd": "Dateiendungen, die in DIESEM Projekt als Code gelten und die Doku-Pflicht ausloesen.",
+  "codeExtsAdd": [".rules", ".flow"],
+
+  "_codeExtsRemove": "Endungen aus der Default-Liste, die hier NICHT als Code gelten sollen.",
+  "codeExtsRemove": [".css"],
+
+  "_codeNamesAdd": "Dateien ohne Endung, die trotzdem Code sind (exakter Dateiname).",
+  "codeNamesAdd": ["Tiltfile"],
+
+  "_excludeAdd": "Zusaetzliches Rauschen: generierte Artefakte, Fixtures, Snapshots.",
+  "excludeAdd": ["*/__snapshots__/*", "src/generated/*", "*.schema.json"],
+
+  "_docPathsAdd": "Zusaetzliche Pfade, die als 'Doku nachgezogen' zaehlen. Default ist ausschliesslich docs/.",
+  "docPathsAdd": []
+}

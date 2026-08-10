@@ -1,0 +1,8 @@
+# Git-Hooks laufen unter Windows über die mit Git ausgelieferte sh.
+# Mit CRLF scheitern sie mit "bad interpreter" — LF ist hier Pflicht, nicht Geschmack.
+.githooks/** text eol=lf
+*.sh text eol=lf
+
+# Markdown und Doku: einheitlich LF im Repo, damit Diffs zwischen
+# Windows- und macOS-Mitwirkenden nicht ganze Dateien als geändert zeigen.
+*.md text eol=lf

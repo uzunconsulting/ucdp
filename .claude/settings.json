@@ -35,6 +35,17 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "matcher": "Write|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-overwrite-guard.ps1')",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PostToolUse": [

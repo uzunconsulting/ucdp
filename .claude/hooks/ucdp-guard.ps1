@@ -24,9 +24,14 @@ $projectDir = $env:CLAUDE_PROJECT_DIR
 if (-not $projectDir) { $projectDir = [string]$in.cwd }
 if (-not $projectDir) { exit 0 }
 
+# Optional: gemeinsame Bibliothek fuer die Uebersetzung von Git-Bash-Pfaden
+# (/c/... -> C:\...). Fehlt sie, arbeitet der Hook wie bisher weiter.
+try { . (Join-Path $PSScriptRoot 'ucdp-lib.ps1') } catch {}
+
 function Norm([string]$p) {
   if ([string]::IsNullOrWhiteSpace($p)) { return $null }
   try {
+    if (Get-Command ConvertFrom-UcdpPosixPath -ErrorAction SilentlyContinue) { $p = ConvertFrom-UcdpPosixPath $p }
     if (-not [System.IO.Path]::IsPathRooted($p)) { $p = Join-Path $projectDir $p }
     return [System.IO.Path]::GetFullPath($p).TrimEnd('\')
   } catch { return $null }
@@ -102,7 +107,7 @@ elseif ($tool -eq 'Bash') {
 
 if ($targets.Count -eq 0) { exit 0 }
 foreach ($t in $targets) {
-  $n = Norm ($t -replace '/','\')
+  $n = Norm $t                      # GetFullPath normalisiert / zu \ selbst
   if (IsOffending $n) { Deny $n }
 }
 exit 0

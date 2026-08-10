@@ -1,0 +1,56 @@
+#!/bin/sh
+# UCDP pre-push (optional, ab v1.5)
+#
+# Aktivieren pro Klon:   git config core.hooksPath .githooks
+#
+# Nicht blockierend. Push ist der letzte Moment, in dem die Doku-Luecke noch
+# billig zu schliessen ist - danach sehen andere den Stand. Geprueft wird der
+# gesamte Push-Bereich, nicht der einzelne Commit: genau die Granularitaet, auf
+# der UCDPs Doku-Pflicht gemeint ist.
+#
+# Ueberspringen:  git push --no-verify
+
+set -u
+YEL=''; NC=''
+if [ -t 2 ]; then YEL='\033[33m'; NC='\033[0m'; fi
+
+[ -f docs/05-status.md ] || exit 0
+
+z40='0000000000000000000000000000000000000000'
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ "$local_sha" = "$z40" ] && continue          # Branch wird geloescht
+  if [ "$remote_sha" = "$z40" ]; then
+    range=$(git rev-list --max-count=50 "$local_sha" --not --remotes 2>/dev/null | tail -1)
+    [ -n "$range" ] || continue
+    range="$range^..$local_sha"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+
+  files=$(git diff --name-only "$range" 2>/dev/null || true)
+  [ -n "$files" ] || continue
+
+  docs_touched=0
+  code_hit=''
+  for f in $files; do
+    case "$f" in
+      docs/*|*/docs/*) docs_touched=1; continue ;;
+      *node_modules/*|*/dist/*|*/build/*|*/.next/*|*.lock|*package-lock.json) continue ;;
+    esac
+    case "$f" in
+      *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs|*.py|*.rb|*.php|*.java|*.kt|*.go|*.rs|*.swift|*.dart|*.cs|*.c|*.cc|*.cpp|*.h|*.sh|*.ps1|*.sql|*.prisma|*.graphql|*.proto|*.css|*.scss|*.vue|*.svelte|*.astro|*.html|*.json|*.yml|*.yaml|*.toml|*.tf|Dockerfile|Makefile)
+        [ -z "$code_hit" ] && code_hit="$f" ;;
+    esac
+  done
+
+  if [ -n "$code_hit" ] && [ "$docs_touched" -eq 0 ]; then
+    printf "${YEL}UCDP pre-push (Hinweis): Dieser Push enthaelt Code-Aenderungen (z. B. %s),${NC}\n" "$code_hit" >&2
+    printf "${YEL}  aber keine einzige Aenderung unter docs/.${NC}\n" >&2
+    printf '  Vor dem Push faellig: ## Ist der Topic-Datei, docs/05-status.md, last_reviewed.\n' >&2
+    printf '  Der Push laeuft weiter.\n' >&2
+  fi
+done
+
+# Projekte mit Build/Test-Gate haengen hier ihren Aufruf an, z. B.:
+#   npm run build --silent || exit 1
+exit 0
