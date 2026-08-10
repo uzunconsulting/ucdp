@@ -11,10 +11,14 @@ unter `examples/`.
 Der Code und die Inhalte deines Projekts gehören dir und tragen die Lizenz, die
 du dafür wählst (oder gar keine, bei proprietären Repos).
 
-Deshalb heißt diese Datei nicht `LICENSE`: eine Datei mit diesem Namen im
-Wurzelverzeichnis würde von GitHub als Lizenz *deines* Projekts erkannt und
-angezeigt — und damit versehentlich CC-BY auf deine Geschäftslogik legen. Lege
-deine eigene `LICENSE` an, wenn dein Projekt eine braucht.
+Deshalb heißt diese Datei weder `LICENSE` noch `PATTERN-LICENSE.md`: GitHubs
+Lizenzerkennung greift nicht nur bei Dateinamen, die mit „LICENSE" *beginnen*,
+sondern auch bei solchen, die darauf **enden** — die verbreitete
+`MIT-LICENSE.txt`-Konvention. Beide Varianten würden von GitHub als Lizenz
+*deines* Projekts angezeigt und damit versehentlich CC-BY auf deine
+Geschäftslogik legen. Der deutsche Name `PATTERN-LIZENZ.md` fällt aus dem
+Suchmuster heraus. Lege deine eigene `LICENSE` an, wenn dein Projekt eine
+braucht.
 
 Nutzt du das Pattern selbst weiter (Weitergabe, Veröffentlichung, abgeleitete
 Fassungen), gilt die folgende Lizenz mit Namensnennung:

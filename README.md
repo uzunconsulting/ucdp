@@ -19,12 +19,12 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
    Pattern gehört und nicht zu deinem Projekt:
 
    ```bash
-   rm -rf examples/ PATTERN.md PATTERN-LICENSE.md
+   rm -rf examples/ PATTERN.md PATTERN-LIZENZ.md
    git add -A && git commit -m "chore: UDDP-Vorlagenreste entfernt"
    ```
 
    `PATTERN.md` kannst du behalten, wenn du die Konvention im Repo
-   nachschlagen willst — dann bleibt auch `PATTERN-LICENSE.md`
+   nachschlagen willst — dann bleibt auch `PATTERN-LIZENZ.md`
    liegen, sie gehört dazu.
 3. **Lizenz festlegen.** Dieses Repo liefert **absichtlich keine**
    `LICENSE` im Wurzelverzeichnis: eine Datei mit diesem Namen
@@ -36,7 +36,7 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
      Auf GitHub: *Add file → Create new file → `LICENSE` →
      „Choose a license template"*.
 
-   `PATTERN-LICENSE.md` betrifft nur das Pattern, nie deinen Code.
+   `PATTERN-LIZENZ.md` betrifft nur das Pattern, nie deinen Code.
 4. **Frontmatter befüllen.** In jeder Datei unter `docs/` und in
    `CLAUDE.md` steht oben ein YAML-Block mit Platzhaltern
    (`<projektname>`, `<n>`, `<YYYY-MM-DD>`). Trage deine echten
@@ -73,9 +73,10 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
 │                              und durch eine projektspezifische
 │                              ersetzen)
 ├── PATTERN.md               ← die UDDP-Konvention im Detail
-├── PATTERN-LICENSE.md       ← CC-BY-4.0, gilt für das PATTERN,
-│                              nicht für dein Projekt. Bewusst nicht
-│                              "LICENSE" — siehe Erste Schritte, Punkt 3
+├── PATTERN-LIZENZ.md        ← CC-BY-4.0, gilt für das PATTERN,
+│                              nicht für dein Projekt. Bewusst ohne
+│                              "LICENSE" im Namen — GitHub würde sie
+│                              sonst als Lizenz deines Repos anzeigen
 ├── CHANGELOG.md             ← optionales Gerüst („was wurde wann
 │                              geändert"); Abgrenzung zu docs/ im Kopf
 ├── CLAUDE.md                ← Session-Disziplin (Quelle, projektspezifisch)
@@ -118,7 +119,7 @@ wird bei Bedarf von Hand angelegt.
 ## Lizenz
 
 Das **Pattern** steht unter CC-BY-4.0 — frei nutzbar mit
-Quellenangabe, siehe [`PATTERN-LICENSE.md`](./PATTERN-LICENSE.md).
+Quellenangabe, siehe [`PATTERN-LIZENZ.md`](./PATTERN-LIZENZ.md).
 
 Für **dein Projekt** gilt sie nicht. Dein Code gehört dir und
 trägt die Lizenz, die du dafür wählst — oder gar keine. Deshalb

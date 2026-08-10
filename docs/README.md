@@ -7,7 +7,7 @@ last_reviewed_by: <n>
 # Projektdokumentation
 
 Diese Dokumentation folgt dem Uzun Digital Documentation
-Pattern (UDDP). Siehe [PATTERN.md](https://github.com/uzunconsulting/ucdp/blob/main/PATTERN.md)
+Pattern (UDDP). Siehe [PATTERN.md](https://github.com/uzunconsulting/UDDP/blob/main/PATTERN.md)
 für die vollständige Beschreibung der Konvention.
 
 ## Dateien

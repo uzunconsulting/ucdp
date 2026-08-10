@@ -980,6 +980,17 @@ durch: 1.0–1.5 erschienen als UCDP, ab 1.6 als UDDP.
     rechtfertigt: **UCDP** ist die etablierte Abkürzung des
     *Uppsala Conflict Data Program*. **UDDP** ist deutlich weniger
     besetzt und damit auffindbar.
+  - **Korrektur zu 1.5**: Die Pattern-Lizenz heißt jetzt
+    `PATTERN-LIZENZ.md`. Der in 1.5 gewählte Name
+    `PATTERN-LICENSE.md` löste GitHubs Lizenzerkennung weiterhin
+    aus — sie greift nicht nur bei Dateinamen, die mit „LICENSE"
+    *beginnen*, sondern auch bei solchen, die darauf **enden**
+    (`MIT-LICENSE.txt`-Konvention). Das Ziel aus 1.5, ein
+    Folgeprojekt nicht versehentlich unter CC-BY zu stellen, war
+    damit verfehlt. Der deutsche Dateiname fällt aus dem
+    Suchmuster heraus. Preis: das Pattern-Repo selbst zeigt keine
+    von GitHub erkannte Lizenz mehr — der Hinweis steht dafür in
+    README und `PATTERN.md`.
 
 ### Migration von v1.x auf 1.6
 
@@ -1065,6 +1076,6 @@ Viel Erfolg beim Einsatz.
 ---
 
 *Dieses Pattern steht unter CC-BY-4.0 — siehe
-[`PATTERN-LICENSE.md`](./PATTERN-LICENSE.md). Die Lizenz gilt für
+[`PATTERN-LIZENZ.md`](./PATTERN-LIZENZ.md). Die Lizenz gilt für
 das Pattern, **nicht** für Projekte, die daraus entstehen: dein
 Code gehört dir und trägt die Lizenz, die du dafür wählst.*
