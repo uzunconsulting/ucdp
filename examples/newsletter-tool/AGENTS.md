@@ -20,7 +20,7 @@
 
 
 
-Dieses Projekt nutzt UCDP (Uzun Consulting Documentation Pattern).
+Dieses Projekt nutzt UDDP (Uzun Digital Documentation Pattern).
 
 Die operative Quelle für Session-Disziplin, Doku-Struktur und
 

@@ -1,6 +1,6 @@
-# UCDP Enforcement-Hooks (optional)
+# UDDP Enforcement-Hooks (optional)
 
-Diese Hooks erzwingen die UCDP-Session-Disziplin **maschinell** — nicht als
+Diese Hooks erzwingen die UDDP-Session-Disziplin **maschinell** — nicht als
 Bitte in `CLAUDE.md`, die eine KI-Session vergessen oder auslegen kann,
 sondern als deterministische Kommandos, die Claude Code (die Harness) an
 festen Lebenszyklus-Punkten ausführt. Verdrahtet sind sie in
@@ -14,12 +14,12 @@ SessionStart, Nudge und Doc-Check ein No-op. Die Skripte sind **portabel**
 
 | Skript | Event | Wirkung |
 |---|---|---|
-| `ucdp-session-start.ps1` | `SessionStart` (auch `compact`/`resume`) | Injiziert Stand-Briefing (Projekt, `last_reviewed` inkl. Stale-Warnung, Branch, uncommittet/ungepusht, letzte 5 Commits) und erzwingt die Leseroutine. Feuert auch nach Kontext-Kompaktierung → Re-Anchoring in langen Sessions. Warnt, wenn die Session **oberhalb** eines UCDP-Projekts gestartet wurde. Dedup pro Session+Source. |
-| `ucdp-guard.ps1` | `PreToolUse` (Write/Edit/NotebookEdit + Bash) | Blockt Schreibzugriffe **außerhalb des eigenen Projektordners** (erlaubt sind nur Projekt + Temp + `~/.claude`). Zwingt zu Handoff-Prompts statt Selbst-Editieren im Nachbarprojekt. |
-| `ucdp-overwrite-guard.ps1` | `PreToolUse` (Write/NotebookEdit + Bash) | Blockt das Überschreiben bestehender Dateien, die **nicht aus Git wiederherstellbar** sind (ungetrackt oder gar kein Repo). Getrackte Dateien bleiben frei. |
-| `ucdp-postedit-nudge.ps1` | `PostToolUse` (Write/Edit) | Einmal pro Session ein sanfter Doku-Hinweis nach der ersten Code-Änderung. |
-| `ucdp-doc-check.ps1` | `Stop` | Blockt das Session-Ende **einmal**, wenn Code geändert wurde, aber unter `docs/` nichts aktualisiert ist. |
-| `ucdp-lib.ps1` | — | Keine Hook-Datei: gemeinsame Klassifikation (Code / Doku / Rauschen) für Nudge, Ende-Check und Überschreibschutz. |
+| `uddp-session-start.ps1` | `SessionStart` (auch `compact`/`resume`) | Injiziert Stand-Briefing (Projekt, `last_reviewed` inkl. Stale-Warnung, Branch, uncommittet/ungepusht, letzte 5 Commits) und erzwingt die Leseroutine. Feuert auch nach Kontext-Kompaktierung → Re-Anchoring in langen Sessions. Warnt, wenn die Session **oberhalb** eines UDDP-Projekts gestartet wurde. Dedup pro Session+Source. |
+| `uddp-guard.ps1` | `PreToolUse` (Write/Edit/NotebookEdit + Bash) | Blockt Schreibzugriffe **außerhalb des eigenen Projektordners** (erlaubt sind nur Projekt + Temp + `~/.claude`). Zwingt zu Handoff-Prompts statt Selbst-Editieren im Nachbarprojekt. |
+| `uddp-overwrite-guard.ps1` | `PreToolUse` (Write/NotebookEdit + Bash) | Blockt das Überschreiben bestehender Dateien, die **nicht aus Git wiederherstellbar** sind (ungetrackt oder gar kein Repo). Getrackte Dateien bleiben frei. |
+| `uddp-postedit-nudge.ps1` | `PostToolUse` (Write/Edit) | Einmal pro Session ein sanfter Doku-Hinweis nach der ersten Code-Änderung. |
+| `uddp-doc-check.ps1` | `Stop` | Blockt das Session-Ende **einmal**, wenn Code geändert wurde, aber unter `docs/` nichts aktualisiert ist. |
+| `uddp-lib.ps1` | — | Keine Hook-Datei: gemeinsame Klassifikation (Code / Doku / Rauschen) für Nudge, Ende-Check und Überschreibschutz. |
 
 ## Sicherheit / Grenzen
 
@@ -54,17 +54,17 @@ des Projektordners.
 
 ## Projektspezifische Konfiguration
 
-`ucdp.config.example.json` nach `.claude/ucdp.config.json` kopieren, wenn in
+`uddp.config.example.json` nach `.claude/uddp.config.json` kopieren, wenn in
 diesem Projekt eine besondere Dateiart die tragende ist (`.tf`, eine
 Regel-`.json`, ein Zustandsautomat) oder etwas zu Unrecht als Code zählt. Die
 Datei gehört **ins Repo** — sie beschreibt das Projekt, nicht die Maschine.
-Ohne sie gelten die Defaults aus `ucdp-lib.ps1`; bei kaputtem JSON ebenfalls.
+Ohne sie gelten die Defaults aus `uddp-lib.ps1`; bei kaputtem JSON ebenfalls.
 
-## Workspace-Umbrella (`.ucdp-workspace`)
+## Workspace-Umbrella (`.uddp-workspace`)
 
 Gehören mehrere Repos zusammen und sollen sich gegenseitig beschreiben dürfen
 (z. B. mehrere Sub-Repos unter einem gemeinsamen Hauptordner), lege im Dach-
-Ordner eine leere Datei **`.ucdp-workspace`** ab. Der Grenzwächter sucht sie
+Ordner eine leere Datei **`.uddp-workspace`** ab. Der Grenzwächter sucht sie
 vom Projektordner aufwärts; wird sie gefunden, gilt der gesamte Dach-Ordner als
 ein zusammenhängender Schreib-Bereich — alle Unterprojekte darunter sind
 gegenseitig beschreibbar, alles außerhalb bleibt blockiert. Funktioniert egal,
@@ -78,16 +78,24 @@ ob die Session im Umbrella oder in einem Sub-Repo startet.
 Im Terminal **vor** dem Start von `claude` setzen:
 
 ```powershell
-$env:UCDP_UNLOCK          = "1"   # Grenzwächter aus (bewusste Cross-Projekt-Session)
-$env:UCDP_ALLOW_OVERWRITE = "1"   # Überschreibschutz aus
-$env:UCDP_NODOC           = "1"   # Doku-Ende-Check aus
+$env:UDDP_UNLOCK          = "1"   # Grenzwächter aus (bewusste Cross-Projekt-Session)
+$env:UDDP_ALLOW_OVERWRITE = "1"   # Überschreibschutz aus
+$env:UDDP_NODOC           = "1"   # Doku-Ende-Check aus
 ```
+
+> **Altnamen bleiben gültig.** Bis Pattern-Version 1.5 hieß das Pattern UCDP;
+> die Variablen hießen entsprechend `UCDP_UNLOCK`, `UCDP_ALLOW_OVERWRITE`,
+> `UCDP_NODOC`. Die Hooks lesen beide Schreibweisen — **unbefristet**. Gleiches
+> gilt für den Umbrella-Marker `.ucdp-workspace` und die Konfigdatei
+> `.claude/ucdp.config.json`. Der Grund: diese drei leben außerhalb des Repos
+> bzw. über mehreren Repos. Ein harter Schnitt würde jedes noch nicht migrierte
+> Nachbarprojekt im selben Moment brechen. Details in `PATTERN.md` §11.
 
 ## Adoption in einem bestehenden Repo
 
 1. Diesen Ordner `.claude/hooks/` und die `.claude/settings.json` ins Ziel-Repo
    kopieren (bei bestehender `settings.json`: den `hooks`-Block einmergen).
-   `ucdp-lib.ps1` nicht vergessen — ohne sie steigen drei Hooks fail-open aus
+   `uddp-lib.ps1` nicht vergessen — ohne sie steigen drei Hooks fail-open aus
    und tun schlicht nichts.
 2. Voraussetzung: **PowerShell 7 (`pwsh`)** auf dem Rechner. Die Skripte
    setzen die ExecutionPolicy prozess-lokal auf `Bypass`, laufen also auch bei
@@ -95,7 +103,7 @@ $env:UCDP_NODOC           = "1"   # Doku-Ende-Check aus
 3. Beim ersten Öffnen der Session fragt Claude Code, ob die Repo-Hooks
    vertraut werden sollen — bestätigen. Danach greifen sie automatisch.
 
-> Läuft parallel eine **globale** UCDP-Hook-Installation (`~/.claude`), sorgt
+> Läuft parallel eine **globale** UDDP-Hook-Installation (`~/.claude`), sorgt
 > die Session-Dedup dafür, dass das Start-Briefing nicht doppelt erscheint.
 
 ## Die Session muss im Projektordner starten

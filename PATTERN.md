@@ -1,11 +1,11 @@
 ---
-title: Uzun Consulting Documentation Pattern (UCDP)
-version: 1.5
+title: Uzun Digital Documentation Pattern (UDDP)
+version: 1.6
 last_reviewed: 2026-08-10
 author: Mustafa Uzun
 ---
 
-# Uzun Consulting Documentation Pattern (UCDP)
+# Uzun Digital Documentation Pattern (UDDP)
 
 Ein strukturiertes Muster für die Projektdokumentation von
 Software-Vorhaben, die mit KI-Assistenten (Claude Code, ChatGPT,
@@ -13,12 +13,22 @@ Cursor, Cline o. Ä.) gebaut, gepflegt und weiterentwickelt
 werden.
 
 Das Pattern ist aus der Praxis entstanden — aus mehreren parallel
-laufenden Projekten bei Uzun Consulting, die agentisch mit KI-
+laufenden Projekten bei Uzun Digital, die agentisch mit KI-
 Assistenten gebaut werden. Ziel des Patterns ist, dass ein KI-
 Assistent zu Beginn jeder Session den Projektstand selbständig
 versteht, während der Arbeit konsistent pflegt und Drift zwischen
 Konzept, Code und Dokumentation sichtbar macht — ohne dass der
 Projektbetreuer das in jeder Session neu erklärt.
+
+> **Herkunft des Namens.** Bis einschließlich Version 1.5 hieß
+> dieses Pattern **UCDP** — *Uzun Consulting Documentation
+> Pattern*. Mit der Umfirmierung auf Uzun Digital heißt es ab
+> **1.6 UDDP**. Es ist dasselbe Pattern: gleiche Struktur, gleiche
+> Regeln, gleiche `docs/`-Ablage. Projekte, die auf einer
+> UCDP-Version aufgesetzt wurden, bleiben unverändert gültig, und
+> alle maschinenlesbaren Altnamen (`.ucdp-workspace`, `UCDP_*`,
+> `ucdp.config.json`) werden von den 1.6-Hooks unbefristet
+> weiterhin akzeptiert — siehe Abschnitt 11.
 
 ## 1. Philosophie
 
@@ -55,7 +65,7 @@ Struktur:
 
 ```
 projekt-repo/
-├── README.md            (Projekt-README — kein UCDP-Inhalt)
+├── README.md            (Projekt-README — kein UDDP-Inhalt)
 ├── CLAUDE.md            (Session-Disziplin, Quelle)
 ├── AGENTS.md            (Pointer auf CLAUDE.md, optional)
 ├── docs/
@@ -268,7 +278,7 @@ ist die flache Tabelle die beste Form.
 
 ADR steht für **Architecture Decision Record** — ein Format, das
 ursprünglich 2011 von Michael Nygard (Software-Architekt)
-geprägt wurde. UCDP übernimmt dieses Format unverändert, fügt
+geprägt wurde. UDDP übernimmt dieses Format unverändert, fügt
 aber eine feste Nummerierung und Cross-Repo-Verweise hinzu.
 
 Jedes ADR folgt dem Schema:
@@ -322,7 +332,7 @@ Dateinamen, um Projekt-Disziplin zu lesen. Claude Code liest
 `CLAUDE.md`. Andere Tools (Cursor, Aider, Copilot u. a.) folgen
 dem informellen `agents.md`-Standard. Statt zwei parallele
 Dateien zu pflegen — mit unvermeidlichem Drift-Risiko —
-unterscheidet UCDP zwischen **Quelle** und **Pointer**:
+unterscheidet UDDP zwischen **Quelle** und **Pointer**:
 
 - **`CLAUDE.md`** ist die **Quelle**. Hier lebt der gesamte
   inhaltliche Stand: Projekt-Beschreibung, Session-Disziplin,
@@ -350,7 +360,7 @@ unterscheidet UCDP zwischen **Quelle** und **Pointer**:
 <!-- BEGIN:session-start -->
 # Session-Start-Routine
 
-Dieses Projekt nutzt UCDP (Uzun Consulting Documentation Pattern).
+Dieses Projekt nutzt UDDP (Uzun Digital Documentation Pattern).
 Die operative Quelle für Session-Disziplin, Doku-Struktur und
 Projekt-Regeln ist `CLAUDE.md` im Repo-Root. Lies sie vor jeder
 inhaltlichen Arbeit, gefolgt von `docs/05-status.md` (offene
@@ -413,7 +423,7 @@ Session, unabhängig vom verwendeten Tool.
 
 ## 8. Setup-Phasen für ein neues Projekt
 
-Wenn UCDP in einem **bestehenden** Projekt eingeführt wird,
+Wenn UDDP in einem **bestehenden** Projekt eingeführt wird,
 empfiehlt sich ein vierphasiges Vorgehen. Bei einem neuen Projekt,
 das aus dem Template angezogen wird, entfallen Phase A und B
 weitgehend — die Struktur ist bereits da.
@@ -478,7 +488,7 @@ was im anderen gerade passiert ist.
 
 ## 10. Agentische Runs (optional)
 
-UCDP entstand aus manuellen KI-Sessions: Mensch sitzt am Rechner,
+UDDP entstand aus manuellen KI-Sessions: Mensch sitzt am Rechner,
 Assistent hilft, Code entsteht in einer interaktiven Schleife. Mit
 reifer werdenden agentischen Setups (Claude Code mit Subagenten,
 Headless-Runs, automatisierte Pipelines) treten zunehmend Sessions
@@ -558,7 +568,7 @@ Volldokumentation.
 
 ### Verhältnis zu `00-handover-*.md`
 
-UCDP kennt seit der Anfangsversion die optionalen
+UDDP kennt seit der Anfangsversion die optionalen
 `00-handover-YYYY-MM-DD.md`-Dateien für einmalige menschliche
 Übergaben. Diese bleiben unverändert bestehen — sie sind
 einmalige, abgeschlossene Markdown-Dateien für „ich übergebe das
@@ -613,7 +623,7 @@ samt `.claude/settings.json`; die Details stehen in
   **Handoff-Prompt** statt eigenmächtiger Edits im fremden Repo —
   die konsequente Umsetzung der Cross-Projekt-Regel aus Abschnitt 9.
   Gehören mehrere Repos bewusst zusammen (gemeinsamer Dach-Ordner),
-  hebt eine Datei `.ucdp-workspace` im Dach-Ordner die Grenze für
+  hebt eine Datei `.uddp-workspace` im Dach-Ordner die Grenze für
   genau diesen Umbrella auf — die Sub-Repos werden gegenseitig
   beschreibbar, alles außerhalb bleibt blockiert.
 - **Überschreibschutz** (`PreToolUse`, seit 1.5): verweigert das
@@ -636,15 +646,15 @@ samt `.claude/settings.json`; die Details stehen in
   durch. Ein Hook darf die Arbeit nie blockieren, nur die
   *Undiszipliniertheit*.
 - **Self-detecting**: ohne `docs/05-status.md` sind die Doku-Hooks
-  ein No-op — Nicht-UCDP-Ordner bleiben unberührt.
+  ein No-op — Nicht-UDDP-Ordner bleiben unberührt.
 - **Portabel**: die Skripte lösen sich relativ zum Repo auf
   (`$env:CLAUDE_PROJECT_DIR`), ohne maschinenspezifische Pfade.
 - **Escapes**: bewusste Ausnahmen über Umgebungsvariablen
-  (`UCDP_UNLOCK` für den Grenzwächter, `UCDP_ALLOW_OVERWRITE` für
-  den Überschreibschutz, `UCDP_NODOC` für den Ende-Check), gesetzt
+  (`UDDP_UNLOCK` für den Grenzwächter, `UDDP_ALLOW_OVERWRITE` für
+  den Überschreibschutz, `UDDP_NODOC` für den Ende-Check), gesetzt
   vor dem Start der Session.
 
-Die Hooks sind bewusst kein Teil des Doku-*Kerns*: UCDP funktioniert
+Die Hooks sind bewusst kein Teil des Doku-*Kerns*: UDDP funktioniert
 auch ohne sie. Sie sind die Antwort auf die Frage „wie halte ich
 eine KI-Session zuverlässig bei der Konvention", wenn Erinnerung
 allein nicht reicht.
@@ -670,15 +680,15 @@ schreiben in denselben Ordner. Genau dort greift der Hook am
 härtesten — in einem Ordner ohne Git ist danach *jedes*
 Überschreiben blockiert, bis entweder gelesen, committet oder
 bewusst gelöscht wurde. Das ist beabsichtigt und der Grund, warum
-es den Escape `UCDP_ALLOW_OVERWRITE` gibt.
+es den Escape `UDDP_ALLOW_OVERWRITE` gibt.
 
-### Projektspezifische Konfiguration (`.claude/ucdp.config.json`)
+### Projektspezifische Konfiguration (`.claude/uddp.config.json`)
 
 Welche Dateiart in einem Projekt die tragende ist, weiß nur das
 Projekt. In einem Next.js-Repo ist es `.tsx`, in einem
 Infrastruktur-Repo `.tf`, in einem regelgetriebenen Produkt eine
 `.json` mit dem Zustandsautomaten. Die optionale, **committete**
-Datei `.claude/ucdp.config.json` erweitert oder kürzt die
+Datei `.claude/uddp.config.json` erweitert oder kürzt die
 Klassifikation:
 
 ```json
@@ -721,6 +731,49 @@ Seit 1.5 erkennt das Session-Start-Briefing diesen Fall (kein
 statt still wirkungslos zu bleiben. Die Regel bleibt trotzdem:
 **eine Session pro Projektordner, gestartet im Projektordner.**
 
+### Namenswechsel und Rückwärtskompatibilität
+
+Mit 1.6 wurde das Pattern von UCDP in UDDP umbenannt. Für die
+Hooks zerfällt das in zwei sehr unterschiedliche Klassen von
+Namen:
+
+**Repo-intern** — die Hook-Dateien (`uddp-*.ps1`), ihre Pfade in
+`.claude/settings.json` und die Konfigdatei. Diese Namen sind nur
+innerhalb eines Repos gekoppelt: `settings.json` zeigt auf die
+Skripte daneben, beides wird zusammen migriert. Ein Repo auf 1.5
+behält seine `ucdp-*.ps1`, ein Repo auf 1.6 hat `uddp-*.ps1` —
+sie wissen nichts voneinander.
+
+**Repo-übergreifend** — hier liegt das ganze Risiko, und es sind
+genau zwei Dinge:
+
+- die Umgebungsvariablen `UDDP_UNLOCK`, `UDDP_NODOC`,
+  `UDDP_ALLOW_OVERWRITE`, `UDDP_SKIP_SECRETS`. Sie leben in der
+  Shell, nicht im Repo — jede Session in jedem Projekt liest
+  dieselbe Variable.
+- der Umbrella-Marker `.uddp-workspace`. Er liegt im Dach-Ordner
+  **über** mehreren Repos, wird aber vom Hook jedes einzelnen
+  Sub-Repos gelesen.
+
+Würden diese hart umgestellt, verlören alle noch nicht migrierten
+Nachbarprojekte im selben Moment ihre Escapes und ihre
+Umbrella-Freigabe — ohne dass sich in ihnen etwas geändert hat.
+Deshalb gilt:
+
+| Neu (ab 1.6) | Alt (bis 1.5) | Status |
+|---|---|---|
+| `UDDP_UNLOCK` | `UCDP_UNLOCK` | beide gültig |
+| `UDDP_NODOC` | `UCDP_NODOC` | beide gültig |
+| `UDDP_ALLOW_OVERWRITE` | `UCDP_ALLOW_OVERWRITE` | beide gültig |
+| `UDDP_SKIP_SECRETS` | `UCDP_SKIP_SECRETS` | beide gültig |
+| `.uddp-workspace` | `.ucdp-workspace` | beide gültig |
+| `.claude/uddp.config.json` | `.claude/ucdp.config.json` | beide gültig, neue Datei gewinnt |
+
+Die Altnamen sind **nicht befristet**. Sie kosten pro Stelle eine
+Zeile und erlauben es, Projekte einzeln und in beliebiger
+Reihenfolge zu migrieren — genau das, was ein Doku-Pattern nicht
+erzwingen darf.
+
 ### Git-Hooks (`.githooks/`) — der andere Moment
 
 Die Hooks oben greifen während einer Claude-Code-Session. Wer von
@@ -749,7 +802,7 @@ Die Aufteilung folgt einer klaren Linie:
   `pre-commit` und noch einmal deutlicher im `pre-push`.
 
 Bewusst **nicht** erzwungen wird ein Doku- oder CHANGELOG-Eintrag
-pro Commit. Das wäre die falsche Granularität: UCDPs Doku-Pflicht
+pro Commit. Das wäre die falsche Granularität: UDDPs Doku-Pflicht
 hängt an der Arbeitseinheit, nicht am einzelnen Commit. Erzwungen
 produziert sie Alibi-Zeilen — und ein Delta-Register voller
 Alibi-Zeilen ist wertloser als eines mit einer ehrlichen Lücke.
@@ -771,7 +824,7 @@ verletzt, weil „nur eben kurz zur Doku dazupacken" praktisch ist.
 Es lohnt sich, diese Regel in `CLAUDE.md` explizit zu formulieren
 und vor jedem Commit zu prüfen.
 
-## 13. Anti-Pattern — wie schlecht-praktiziertes UCDP aussieht
+## 13. Anti-Pattern — wie schlecht-praktiziertes UDDP aussieht
 
 Wenn du einen oder mehrere der folgenden Punkte in deinem Repo
 beobachtest, lohnt sich ein bewusstes Aufräumen — sonst verliert
@@ -830,7 +883,7 @@ ignoriert. Gegenmittel: bei Run-Abschluss konsequent Status
 setzen und Strikethrough anwenden; bei dauerhaft hoher Run-Anzahl
 analog zum Delta-Register-Archiv eine Archiv-Datei einführen.
 
-## 14. Was UCDP bewusst *nicht* ist
+## 14. Was UDDP bewusst *nicht* ist
 
 Das Pattern ist keine vollständige Software-Engineering-Methode.
 Es ersetzt weder Code-Reviews, noch Tests, noch Issue-Tracker,
@@ -848,8 +901,9 @@ einzigen Sitzung im Kopf behalten kann.
 ## 15. Pattern-Versionierung
 
 Die Pattern-Konvention selbst entwickelt sich weiter. Aktuelle 
-Version: **1.5**. Änderungen werden als Anhang in dieser Datei
-dokumentiert.
+Version: **1.6**. Änderungen werden als Anhang in dieser Datei
+dokumentiert. Die Versionsreihe läuft über die Umbenennung hinweg
+durch: 1.0–1.5 erschienen als UCDP, ab 1.6 als UDDP.
 
 ### Versionshistorie
 
@@ -877,19 +931,21 @@ dokumentiert.
   Template unter `.claude/hooks/` + `.claude/settings.json`.
   Optional, fail-open, self-detecting; Nicht-Hook-Harnesses
   ignorieren `.claude/` folgenlos. Grenzwächter mit optionalem
-  Workspace-Umbrella (`.ucdp-workspace`) für bewusst zusammen-
-  gehörende Repos unter einem Dach-Ordner.
+  Workspace-Umbrella (damals `.ucdp-workspace`) für bewusst
+  zusammengehörende Repos unter einem Dach-Ordner.
 - **1.5** (2026-08-10) — Härtung der Enforcement-Schicht aus 1.4,
   aus dem Einsatz in mehreren Folgeprojekten:
   - **Überschreibschutz** als fünfter Hook: bestehende, nicht aus
     Git wiederherstellbare Dateien sind gegen Überschreiben
     gesperrt (Abschnitt 11).
   - **Eine Code-Klassifikation statt zweier.** Nudge und
-    Ende-Check teilen sich `ucdp-lib.ps1`; die Listen waren in
-    1.4 bereits auseinandergelaufen. Konfiguration-als-Daten
-    (`.json`, `.yml`, `.toml`, `.tf` …) zählt jetzt als Code,
-    Lockfiles und Build-Artefakte sind ausgenommen.
-  - **Projektspezifische Konfiguration** `.claude/ucdp.config.json`.
+    Ende-Check teilen sich eine gemeinsame Bibliothek (damals
+    `ucdp-lib.ps1`); die Listen waren in 1.4 bereits
+    auseinandergelaufen. Konfiguration-als-Daten (`.json`, `.yml`,
+    `.toml`, `.tf` …) zählt jetzt als Code, Lockfiles und
+    Build-Artefakte sind ausgenommen.
+  - **Projektspezifische Konfiguration** (damals
+    `.claude/ucdp.config.json`).
   - **Doku-Pflicht präzisiert**: nur Änderungen unter `docs/`
     quittieren sie. In 1.4 genügte jede beliebige `.md` im Repo.
   - **Warnung bei falschem Startordner** im Session-Start-Briefing.
@@ -906,11 +962,32 @@ dokumentiert.
   - **`CHANGELOG.md`-Gerüst** plus Abgrenzung zu `docs/`
     (Abschnitt 2).
   - `.gitignore` deckt `.claude/settings.local.json` ab.
+- **1.6** (2026-08-10) — **Umbenennung: UCDP → UDDP.** Das Pattern
+  hieß bis einschließlich 1.5 *Uzun Consulting Documentation
+  Pattern*; mit der Umfirmierung auf **Uzun Digital** heißt es ab
+  1.6 *Uzun Digital Documentation Pattern*. Inhaltlich ist 1.6
+  identisch mit 1.5 — kein neues Konzept, keine neue Regel, keine
+  Änderung an `docs/`.
+  - Hook-Dateien heißen `uddp-*.ps1`, die Projekt-Konfiguration
+    `.claude/uddp.config.json`, der Umbrella-Marker
+    `.uddp-workspace`, die Escapes `UDDP_UNLOCK`, `UDDP_NODOC`,
+    `UDDP_ALLOW_OVERWRITE`, `UDDP_SKIP_SECRETS`.
+  - **Alle alten Namen bleiben unbefristet gültig** — siehe
+    Abschnitt 11, „Namenswechsel und Rückwärtskompatibilität".
+    Ein Projekt kann auf 1.6 gehoben werden, ohne dass ein
+    Nachbarprojekt gleichzeitig migriert werden muss.
+  - Nebeneffekt, der die Umbenennung unabhängig von der Firmierung
+    rechtfertigt: **UCDP** ist die etablierte Abkürzung des
+    *Uppsala Conflict Data Program*. **UDDP** ist deutlich weniger
+    besetzt und damit auffindbar.
 
-### Migration von 1.4 auf 1.5
+### Migration von v1.x auf 1.6
 
-Bestehende 1.4-Projekte bleiben gültig. Wer nachziehen will,
-sortiert nach Dringlichkeit:
+Bestehende Projekte auf 1.0–1.5 bleiben gültig. Wer nachziehen
+will, sortiert nach Dringlichkeit. Die Reihenfolge gilt unabhängig
+davon, von welcher Version aus migriert wird — der Ausgangsstand
+wird am Repo abgelesen, nicht an einer notierten Versionsnummer
+(die ein Folgeprojekt nirgends führt).
 
 **Sofort, unabhängig von allem anderen** — eine Zeile, verhindert
 einen committeten Schlüssel:
@@ -931,31 +1008,49 @@ Steckt in der Historie schon ein echter Schlüssel, ist er
 verbrannt — rotieren, nicht nur löschen.
 
 **Dringend, wenn das Projekt noch jung ist** (viel ungetrackte
-Arbeit, mehrere Agenten): `.claude/hooks/ucdp-overwrite-guard.ps1`
-kopieren und in `.claude/settings.json` als `PreToolUse` mit
-Matcher `Write|NotebookEdit|Bash` eintragen.
+Arbeit, mehrere Agenten): `.claude/hooks/uddp-overwrite-guard.ps1`
+und `uddp-lib.ps1` kopieren und in `.claude/settings.json` als
+`PreToolUse` mit Matcher `Write|NotebookEdit|Bash` eintragen.
 
-**Empfohlen**: `ucdp-lib.ps1` kopieren und `ucdp-doc-check.ps1`,
-`ucdp-postedit-nudge.ps1` sowie `ucdp-guard.ps1` durch die
-1.5-Fassungen ersetzen. Ohne das prüft der Ende-Check `.json`/`.yml`
-nicht, lässt jede beliebige `.md` als Doku-Nachweis durchgehen, und
-der Grenzwächter blockiert unter Windows gelegentlich den eigenen
-Ordner (Git-Bash-Pfade).
+**Empfohlen, sofern `.claude/hooks/` bereits existiert** (ab 1.4):
+den ganzen Hook-Satz durch die 1.6-Fassung ersetzen und die Pfade
+in `.claude/settings.json` mitziehen. Ohne das prüft der
+Ende-Check `.json`/`.yml` nicht, lässt jede beliebige `.md` als
+Doku-Nachweis durchgehen, und der Grenzwächter blockiert unter
+Windows gelegentlich den eigenen Ordner (Git-Bash-Pfade). Alte
+Dateinamen einfach löschen — `settings.json` zeigt danach auf die
+neuen.
+
+**Wenn `.claude/` gar nicht existiert** (1.0–1.3): Die Hooks sind
+optional und nachrüstbar, aber keine Voraussetzung. Der Rest
+dieser Migration funktioniert auch ohne sie.
+
+**Wenn `AGENTS.md` noch die inhaltliche Quelle ist** (vor 1.2):
+Pointer/Quelle-Trennung nach Abschnitt 7 nachziehen — Inhalt nach
+`CLAUDE.md`, `AGENTS.md` auf den kurzen Pointer reduzieren.
 
 **Optional**: `.githooks/`, `CHANGELOG.md`, `.gitattributes`,
-`.claude/ucdp.config.json`. Keines davon ist Voraussetzung für
+`.claude/uddp.config.json`. Keines davon ist Voraussetzung für
 die übrigen Punkte.
 
 **Nur bei öffentlichen oder fremdgenutzten Repos**: prüfen, ob
 eine aus dem Template mitkopierte CC-BY-`LICENSE` im Root liegt,
 die nicht gemeint ist.
 
+**Zur Umbenennung**: Es gibt keinen Zwang, alte Namen anzufassen.
+Ein Projekt kann dauerhaft `.ucdp-workspace` und `UCDP_*`
+weiterverwenden — die 1.6-Hooks lesen beides. Wer umbenennt,
+benennt am besten zuerst die repo-internen Dinge um (Dateien,
+`settings.json`, Konfigdatei) und zuletzt die repo-übergreifenden
+(Marker im Dach-Ordner, Shell-Variablen), weil letztere alle
+Projekte gleichzeitig betreffen.
+
 Nichts davon berührt `docs/`. Die Struktur 01–06/08, das
-Delta-Register und die ADRs sind zwischen 1.4 und 1.5 unverändert.
+Delta-Register und die ADRs sind seit 1.3 unverändert.
 
 ## 16. Abschluss
 
-UCDP ist kein abgeschlossenes System, sondern ein in der Praxis
+UDDP ist kein abgeschlossenes System, sondern ein in der Praxis
 entstandenes und sich weiterentwickelndes Muster. Wenn du es in
 eigenen Projekten einsetzt und merkst, dass etwas fehlt oder
 verbessert werden kann, ist das Teil der erwarteten Dynamik.

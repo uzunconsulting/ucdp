@@ -6,9 +6,9 @@
           {
             "type": "command",
             "shell": "powershell",
-            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-session-start.ps1')",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\uddp-session-start.ps1')",
             "timeout": 20,
-            "statusMessage": "UCDP: aktuellen Stand laden"
+            "statusMessage": "UDDP: aktuellen Stand laden"
           }
         ]
       }
@@ -20,7 +20,7 @@
           {
             "type": "command",
             "shell": "powershell",
-            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-guard.ps1')",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\uddp-guard.ps1')",
             "timeout": 15
           }
         ]
@@ -31,7 +31,7 @@
           {
             "type": "command",
             "shell": "powershell",
-            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-guard.ps1')",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\uddp-guard.ps1')",
             "timeout": 15
           }
         ]
@@ -42,7 +42,7 @@
           {
             "type": "command",
             "shell": "powershell",
-            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-overwrite-guard.ps1')",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\uddp-overwrite-guard.ps1')",
             "timeout": 15
           }
         ]
@@ -55,7 +55,7 @@
           {
             "type": "command",
             "shell": "powershell",
-            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-postedit-nudge.ps1')",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\uddp-postedit-nudge.ps1')",
             "timeout": 15
           }
         ]
@@ -67,7 +67,7 @@
           {
             "type": "command",
             "shell": "powershell",
-            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\ucdp-doc-check.ps1')",
+            "command": "Set-ExecutionPolicy -Scope Process Bypass -Force; & (Join-Path $env:CLAUDE_PROJECT_DIR '.claude\\hooks\\uddp-doc-check.ps1')",
             "timeout": 20
           }
         ]

@@ -9,7 +9,7 @@
 <!-- BEGIN:session-start -->
 # Session-Start-Routine
 
-Dieses Projekt nutzt UCDP (Uzun Consulting Documentation Pattern).
+Dieses Projekt nutzt UDDP (Uzun Digital Documentation Pattern).
 Die operative Quelle für Session-Disziplin, Doku-Struktur und
 Projekt-Regeln ist `CLAUDE.md` im Repo-Root. Lies sie vor jeder
 inhaltlichen Arbeit, gefolgt von `docs/05-status.md` (offene

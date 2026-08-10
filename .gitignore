@@ -28,7 +28,7 @@ lerna-debug.log*
 *.log
 
 # KI-Werkzeuge — lokale, maschinengebundene Dateien.
-# WICHTIG: .claude/settings.json, .claude/hooks/ und .claude/ucdp.config.json gehören
+# WICHTIG: .claude/settings.json, .claude/hooks/ und .claude/uddp.config.json gehören
 # INS Repo — sie sind Projekt-Disziplin. Ignoriert wird nur, was pro Maschine entsteht:
 # settings.local.json sammelt erteilte Berechtigungen und enthält erfahrungsgemäß
 # auch mal einen Key im Klartext.

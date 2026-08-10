@@ -1,4 +1,4 @@
-# UCDP Git-Hooks (optional)
+# UDDP Git-Hooks (optional)
 
 Die Hooks unter [`../.claude/hooks/`](../.claude/hooks/) greifen **während einer
 Claude-Code-Session**. Wer von Hand committet, mit einem anderen Assistenten
@@ -46,7 +46,7 @@ verschwindet — das rechtfertigt einen harten Stopp. Fehlende Doku dagegen ist
 jederzeit nachholbar.
 
 Ein erzwungener `docs/`- oder CHANGELOG-Eintrag **pro Commit** hätte zudem die
-falsche Granularität: UCDPs Doku-Pflicht hängt an der Arbeitseinheit, nicht am
+falsche Granularität: UDDPs Doku-Pflicht hängt an der Arbeitseinheit, nicht am
 einzelnen Commit. Erzwungen produziert sie Alibi-Zeilen, und Alibi-Zeilen sind
 schlimmer als eine ehrliche Lücke — sie machen das Delta-Register unglaubwürdig.
 Deshalb: `pre-commit` erinnert, `pre-push` erinnert deutlicher, blockiert wird
@@ -56,7 +56,7 @@ tatsächlich endet.
 ## Notausgänge
 
 ```bash
-UCDP_SKIP_SECRETS=1 git commit -m "…"   # nur der Secret-Scan aus
+UDDP_SKIP_SECRETS=1 git commit -m "…"   # nur der Secret-Scan aus (UCDP_SKIP_SECRETS gilt weiter)
 git commit --no-verify                   # alle pre-commit-Prüfungen aus
 git push --no-verify                     # pre-push aus
 ```

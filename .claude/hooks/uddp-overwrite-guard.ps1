@@ -1,4 +1,4 @@
-# UCDP Ueberschreibschutz (PreToolUse: Write | NotebookEdit | Bash)  - neu in v1.5
+# UDDP Ueberschreibschutz (PreToolUse: Write | NotebookEdit | Bash)  - neu in v1.5
 #
 # Blockt das Ueberschreiben einer bestehenden Datei, die NICHT aus Git wiederherstellbar ist
 # (kein Repo, oder Datei ungetrackt). Getrackte Dateien duerfen ueberschrieben werden - die
@@ -12,7 +12,7 @@
 # Write/NotebookEdit: harte Sperre.  Bash: best-effort (Umleitung >, Set-Content/Out-File,
 # cp/mv/Copy-Item/Move-Item). Ein per Shell zusammengebauter Pfad wird nicht erkannt.
 #
-# Escape: $env:UCDP_ALLOW_OVERWRITE=1 vor dem Start von claude. Fail-open bei jedem Fehler.
+# Escape: $env:UDDP_ALLOW_OVERWRITE=1 vor dem Start von claude. Fail-open bei jedem Fehler.
 $ErrorActionPreference = 'Stop'
 try {
   $raw = [Console]::In.ReadToEnd()
@@ -20,20 +20,20 @@ try {
   $in = $raw | ConvertFrom-Json
 } catch { exit 0 }
 
-if ($env:UCDP_ALLOW_OVERWRITE -eq '1') { exit 0 }
+if ($env:UDDP_ALLOW_OVERWRITE -eq '1' -or $env:UCDP_ALLOW_OVERWRITE -eq '1') { exit 0 }   # UCDP_*: Altname, bleibt gueltig
 
 $projectDir = $env:CLAUDE_PROJECT_DIR
 if (-not $projectDir) { $projectDir = [string]$in.cwd }
 if (-not $projectDir) { exit 0 }
 
-try { . (Join-Path $PSScriptRoot 'ucdp-lib.ps1') } catch { exit 0 }
-try { $cfg = Get-UcdpConfig -ProjectDir $projectDir } catch { $cfg = $null }
+try { . (Join-Path $PSScriptRoot 'uddp-lib.ps1') } catch { exit 0 }
+try { $cfg = Get-UddpConfig -ProjectDir $projectDir } catch { $cfg = $null }
 
 function Norm([string]$p) {
   if ([string]::IsNullOrWhiteSpace($p)) { return $null }
   try {
     $p = $p.Trim().Trim('"').Trim("'")
-    if (Get-Command ConvertFrom-UcdpPosixPath -ErrorAction SilentlyContinue) { $p = ConvertFrom-UcdpPosixPath $p }
+    if (Get-Command ConvertFrom-UddpPosixPath -ErrorAction SilentlyContinue) { $p = ConvertFrom-UddpPosixPath $p }
     if (-not [System.IO.Path]::IsPathRooted($p)) { $p = Join-Path $projectDir $p }
     return [System.IO.Path]::GetFullPath($p).TrimEnd('\')
   } catch { return $null }
@@ -41,7 +41,7 @@ function Norm([string]$p) {
 
 function Deny([string]$path, [string]$why) {
   $reason = @"
-UCDP-Ueberschreibschutz: Diese Datei existiert bereits und ist NICHT aus Git wiederherstellbar.
+UDDP-Ueberschreibschutz: Diese Datei existiert bereits und ist NICHT aus Git wiederherstellbar.
   Ziel  : $path
   Grund : $why
 
@@ -51,7 +51,7 @@ Waehle bewusst einen Weg:
   1. Datei erst LESEN (Read) und gezielt per Edit aendern statt sie komplett zu ersetzen.
   2. Bestand sichern:  git add <datei> && git commit  - danach ist Ueberschreiben gefahrlos.
   3. Inhalt ist wirklich wertlos: Datei explizit loeschen, dann neu schreiben.
-Bewusste Ausnahme fuer die ganze Session:  `$env:UCDP_ALLOW_OVERWRITE=1  vor dem Start von claude.
+Bewusste Ausnahme fuer die ganze Session:  `$env:UDDP_ALLOW_OVERWRITE=1  vor dem Start von claude.
 "@
   (@{ hookSpecificOutput = @{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = $reason } } | ConvertTo-Json -Depth 6 -Compress)
   exit 0
@@ -98,8 +98,8 @@ foreach ($t in $targets) {
   if (-not $absFwd.StartsWith($rootFwd, [System.StringComparison]::OrdinalIgnoreCase)) { continue }
 
   # Build-Artefakte, Lockfiles, Werkzeug-Interna: kein schuetzenswerter Inhalt.
-  $rel = ConvertTo-UcdpRelPath -Path $abs -ProjectDir $projectDir
-  if ($cfg -and (Test-UcdpExcluded -RelPath $rel -Config $cfg)) { continue }
+  $rel = ConvertTo-UddpRelPath -Path $abs -ProjectDir $projectDir
+  if ($cfg -and (Test-UddpExcluded -RelPath $rel -Config $cfg)) { continue }
 
   # Wiederherstellbar aus Git?
   $inRepo = $false

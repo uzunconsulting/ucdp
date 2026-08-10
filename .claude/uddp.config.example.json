@@ -1,8 +1,8 @@
 {
   "_hinweis": [
-    "Optionale Projekt-Konfiguration fuer die UCDP-Hooks (ab v1.5).",
-    "Zum Aktivieren nach '.claude/ucdp.config.json' kopieren und anpassen.",
-    "Ohne diese Datei gelten die Defaults aus .claude/hooks/ucdp-lib.ps1.",
+    "Optionale Projekt-Konfiguration fuer die UDDP-Hooks (ab v1.5).",
+    "Zum Aktivieren nach '.claude/uddp.config.json' kopieren und anpassen.",
+    "Ohne diese Datei gelten die Defaults aus .claude/hooks/uddp-lib.ps1.",
     "Die Datei gehoert INS Repo (committen) - sie beschreibt das Projekt, nicht die Maschine.",
     "Bei kaputtem JSON fallen die Hooks stillschweigend auf die Defaults zurueck.",
     "Alle Muster gelten gegen den projekt-relativen Pfad mit Forward-Slashes, case-insensitiv.",

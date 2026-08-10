@@ -1,6 +1,6 @@
-# UCDP SessionStart-Briefing
+# UDDP SessionStart-Briefing
 # Injiziert aktuellen Projektstand + Leseroutine. Feuert bei startup/resume/clear/compact.
-# No-op ausserhalb von UCDP-Projekten (kein docs/05-status.md). Fail-open.
+# No-op ausserhalb von UDDP-Projekten (kein docs/05-status.md). Fail-open.
 $ErrorActionPreference = 'Stop'
 try {
   $raw = [Console]::In.ReadToEnd()
@@ -16,7 +16,7 @@ $sid    = if ($in) { [string]$in.session_id } else { '' }
 
 $status = Join-Path $projectDir 'docs\05-status.md'
 if (-not (Test-Path -LiteralPath $status)) {
-  # Kein UCDP-Projekt an dieser Stelle. ABER: liegt eines DARUNTER, ist die Session
+  # Kein UDDP-Projekt an dieser Stelle. ABER: liegt eines DARUNTER, ist die Session
   # eine Ebene zu hoch gestartet (v1.5). Folge: Doku-Hooks sind ein No-op und die
   # Grenzwaechter-Wurzel rutscht auf den Elternordner - die Grenze ist faktisch weg.
   # Das laut sagen statt still auszusteigen.
@@ -43,14 +43,16 @@ if (-not (Test-Path -LiteralPath $status)) {
   if ($found.Count -eq 0) { exit 0 }
 
   if ($sid) {
-    $wFlag = Join-Path ([System.IO.Path]::GetTempPath()) ("ucdp-warn-$sid-$source.flag")
-    if (Test-Path -LiteralPath $wFlag) { exit 0 }
+    $tmp   = [System.IO.Path]::GetTempPath()
+    $wFlag = Join-Path $tmp ("uddp-warn-$sid-$source.flag")
+    $wOld  = Join-Path $tmp ("ucdp-warn-$sid-$source.flag")   # Hook-Satz vor 1.6 parallel aktiv
+    if ((Test-Path -LiteralPath $wFlag) -or (Test-Path -LiteralPath $wOld)) { exit 0 }
     try { New-Item -ItemType File -Path $wFlag -Force -ErrorAction Stop | Out-Null } catch {}
   }
   $w  = @()
-  $w += "=== UCDP-WARNUNG: Session im FALSCHEN Ordner gestartet. ==="
+  $w += "=== UDDP-WARNUNG: Session im FALSCHEN Ordner gestartet. ==="
   $w += "Aktuell: $projectDir  - hier liegt kein docs/05-status.md."
-  $w += "UCDP-Projekt(e) unterhalb dieses Ordners:"
+  $w += "UDDP-Projekt(e) unterhalb dieses Ordners:"
   foreach ($f in $found) { $w += "  - $f" }
   $w += ""
   $w += "Folgen in diesem Zustand:"
@@ -72,8 +74,10 @@ $proj = Split-Path $projectDir -Leaf
 # Dedup pro Session+Source: verhindert doppeltes Briefing, falls globale UND Repo-Hooks aktiv sind.
 # Source im Schluessel -> Re-Briefing bei compact/resume bleibt erhalten.
 if ($sid) {
-  $ssFlag = Join-Path ([System.IO.Path]::GetTempPath()) ("ucdp-ss-$sid-$source.flag")
-  if (Test-Path -LiteralPath $ssFlag) { exit 0 }
+  $tmp    = [System.IO.Path]::GetTempPath()
+  $ssFlag = Join-Path $tmp ("uddp-ss-$sid-$source.flag")
+  $ssOld  = Join-Path $tmp ("ucdp-ss-$sid-$source.flag")   # globaler Hook-Satz vor 1.6: kein Doppel-Briefing
+  if ((Test-Path -LiteralPath $ssFlag) -or (Test-Path -LiteralPath $ssOld)) { exit 0 }
   try { New-Item -ItemType File -Path $ssFlag -Force -ErrorAction Stop | Out-Null } catch {}
 }
 
@@ -101,9 +105,9 @@ $log = GitCmd @('log','--oneline','-5')
 $logText = if ($log) { ($log -join "`n") } else { '(kein git-log verfuegbar)' }
 
 $header = if ($source -in @('compact','resume')) {
-  "UCDP-Kontext NEU VERANKERN ($source) - lange/fortgesetzte Session: hol dir den AKTUELLEN Stand erneut, bevor du weiterarbeitest."
+  "UDDP-Kontext NEU VERANKERN ($source) - lange/fortgesetzte Session: hol dir den AKTUELLEN Stand erneut, bevor du weiterarbeitest."
 } else {
-  "UCDP-Session gestartet."
+  "UDDP-Session gestartet."
 }
 
 $lines = @()

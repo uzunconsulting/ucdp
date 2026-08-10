@@ -1,8 +1,8 @@
-# UCDP — Uzun Consulting Documentation Pattern
+# UDDP — Uzun Digital Documentation Pattern
 
 Dies ist ein **GitHub-Repository-Template** für AI-assisted-
 Software-Projekte. Es liefert eine fertig strukturierte Doku-
-Skelett-Ablage, die der UCDP-Konvention folgt.
+Skelett-Ablage, die der UDDP-Konvention folgt.
 
 Die Konvention selbst — Philosophie, Struktur, Disziplin — ist
 in [`PATTERN.md`](./PATTERN.md) beschrieben.
@@ -20,7 +20,7 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
 
    ```bash
    rm -rf examples/ PATTERN.md PATTERN-LICENSE.md
-   git add -A && git commit -m "chore: UCDP-Vorlagenreste entfernt"
+   git add -A && git commit -m "chore: UDDP-Vorlagenreste entfernt"
    ```
 
    `PATTERN.md` kannst du behalten, wenn du die Konvention im Repo
@@ -60,8 +60,8 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
    - `.githooks/` — Secret-Schutz beim Commit, Doku-Warnung bei
      Commit und Push. Muss pro Klon aktiviert werden (siehe oben).
    - `CHANGELOG.md` — Gerüst. Kein Release nach außen? Löschen.
-   - `.claude/ucdp.config.example.json` — nach
-     `.claude/ucdp.config.json` kopieren, wenn in deinem Projekt
+   - `.claude/uddp.config.example.json` — nach
+     `.claude/uddp.config.json` kopieren, wenn in deinem Projekt
      eine besondere Dateiart die tragende ist (z. B. `.tf` oder
      eine Regel-`.json`).
 
@@ -72,7 +72,7 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
 ├── README.md                ← diese Datei (im Folgeprojekt löschen
 │                              und durch eine projektspezifische
 │                              ersetzen)
-├── PATTERN.md               ← die UCDP-Konvention im Detail
+├── PATTERN.md               ← die UDDP-Konvention im Detail
 ├── PATTERN-LICENSE.md       ← CC-BY-4.0, gilt für das PATTERN,
 │                              nicht für dein Projekt. Bewusst nicht
 │                              "LICENSE" — siehe Erste Schritte, Punkt 3
@@ -85,7 +85,7 @@ Ein vollständig ausgefülltes Beispielprojekt liegt unter
 ├── .claude/                 ← optionale Enforcement-Hooks (Claude Code):
 │   ├── settings.json          erzwingt die Session-Disziplin maschinell
 │   ├── hooks/                 (siehe PATTERN.md §11); löschbar, falls ungenutzt
-│   └── ucdp.config.example.json  projektspezifische Code-Klassifikation
+│   └── uddp.config.example.json  projektspezifische Code-Klassifikation
 ├── .githooks/               ← optionale Git-Hooks (werkzeugunabhängig):
 │   ├── pre-commit             blockt Secrets/.env, warnt bei fehlender Doku
 │   └── pre-push               warnt bei Code-Push ohne docs/
@@ -110,7 +110,7 @@ wird bei Bedarf von Hand angelegt.
 ## Was dieses Repo nicht enthält
 
 - Keinen Quellcode, keine Build-Konfiguration, keine
-  Programmiersprachen-Wahl. UCDP ist eine **Doku-Konvention**,
+  Programmiersprachen-Wahl. UDDP ist eine **Doku-Konvention**,
   kein Tech-Stack-Boilerplate.
 - Keine Init-Skripte. Die Ordnerstruktur ist bereits angelegt;
   ein zusätzliches Skript wäre redundant.
@@ -128,10 +128,18 @@ Geschäftslogik legen.
 
 ## Pattern-Versionierung
 
-Aktuelle UCDP-Version: **1.5** (siehe `PATTERN.md` Frontmatter).
+Aktuelle UDDP-Version: **1.6** (siehe `PATTERN.md` Frontmatter).
 
-v1.5 härtet die Enforcement-Schicht aus 1.4, angestoßen durch
-Befunde aus Folgeprojekten:
+v1.6 ist die **Umbenennung** UCDP → UDDP nach der Umfirmierung auf
+Uzun Digital. Inhaltlich identisch mit 1.5 — keine neue Regel,
+keine Änderung an `docs/`. Hook-Dateien heißen jetzt `uddp-*.ps1`,
+die Escapes `UDDP_*`, der Umbrella-Marker `.uddp-workspace`.
+**Alle alten Namen bleiben unbefristet gültig**, damit Projekte
+einzeln und in beliebiger Reihenfolge migrieren können
+(`PATTERN.md` §11, „Namenswechsel und Rückwärtskompatibilität").
+
+v1.5 härtete zuvor die Enforcement-Schicht aus 1.4, angestoßen
+durch Befunde aus Folgeprojekten:
 
 - **Überschreibschutz** — bestehende, nicht aus Git
   wiederherstellbare Dateien lassen sich nicht mehr überschreiben.
@@ -144,9 +152,10 @@ Befunde aus Folgeprojekten:
 - **Optionale Git-Hooks** (`.githooks/`) für den Commit-Moment.
 - **Lizenz-, `.gitignore`- und `CHANGELOG`-Korrekturen** (siehe oben).
 
-Was 1.4-Projekte nachziehen sollten und was optional ist, steht in
-`PATTERN.md` §15 unter „Migration von 1.4 auf 1.5". Die
-`docs/`-Struktur ist unverändert.
+Was ein bestehendes Projekt nachziehen sollte und was optional ist,
+steht in `PATTERN.md` §15 unter „Migration von v1.x auf 1.6" — nach
+Dringlichkeit sortiert und unabhängig davon, von welcher Version
+aus migriert wird. Die `docs/`-Struktur ist unverändert.
 
 v1.4 hatte zuvor die **Enforcement-Hooks** eingeführt
 (`.claude/hooks/` + `.claude/settings.json`, `PATTERN.md` §11);

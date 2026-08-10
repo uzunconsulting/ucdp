@@ -1,8 +1,8 @@
-# Lizenz des UCDP-*Patterns*
+# Lizenz des UDDP-*Patterns*
 
-Copyright (c) 2026 Mustafa Uzun / Uzun Consulting
+Copyright (c) 2026 Mustafa Uzun / Uzun Digital
 
-Diese Lizenz gilt für das **Uzun Consulting Documentation Pattern** selbst —
+Diese Lizenz gilt für das **Uzun Digital Documentation Pattern** selbst —
 also für `PATTERN.md`, die Skelett-Dateien unter `docs/`, `CLAUDE.md`,
 `AGENTS.md`, die Hooks unter `.claude/` und `.githooks/` sowie das Beispiel
 unter `examples/`.

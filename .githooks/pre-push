@@ -1,12 +1,12 @@
 #!/bin/sh
-# UCDP pre-push (optional, ab v1.5)
+# UDDP pre-push (optional, ab v1.5)
 #
 # Aktivieren pro Klon:   git config core.hooksPath .githooks
 #
 # Nicht blockierend. Push ist der letzte Moment, in dem die Doku-Luecke noch
 # billig zu schliessen ist - danach sehen andere den Stand. Geprueft wird der
 # gesamte Push-Bereich, nicht der einzelne Commit: genau die Granularitaet, auf
-# der UCDPs Doku-Pflicht gemeint ist.
+# der UDDPs Doku-Pflicht gemeint ist.
 #
 # Ueberspringen:  git push --no-verify
 
@@ -44,7 +44,7 @@ while read -r _local_ref local_sha _remote_ref remote_sha; do
   done
 
   if [ -n "$code_hit" ] && [ "$docs_touched" -eq 0 ]; then
-    printf "${YEL}UCDP pre-push (Hinweis): Dieser Push enthaelt Code-Aenderungen (z. B. %s),${NC}\n" "$code_hit" >&2
+    printf "${YEL}UDDP pre-push (Hinweis): Dieser Push enthaelt Code-Aenderungen (z. B. %s),${NC}\n" "$code_hit" >&2
     printf "${YEL}  aber keine einzige Aenderung unter docs/.${NC}\n" >&2
     printf '  Vor dem Push faellig: ## Ist der Topic-Datei, docs/05-status.md, last_reviewed.\n' >&2
     printf '  Der Push laeuft weiter.\n' >&2

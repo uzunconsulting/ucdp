@@ -1,18 +1,18 @@
-# UCDP Hook-Bibliothek (gemeinsam genutzt, ab v1.5)
+# UDDP Hook-Bibliothek (gemeinsam genutzt, ab v1.5)
 #
 # Zweck: Die Klassifikation "was ist Code, was ist Doku, was ist Rauschen" existiert
-# GENAU EINMAL. In v1.4 lag sie doppelt (ucdp-doc-check.ps1 und ucdp-postedit-nudge.ps1)
+# GENAU EINMAL. In v1.4 lag sie doppelt (uddp-doc-check.ps1 und uddp-postedit-nudge.ps1)
 # und war bereits auseinandergelaufen: der Nudge kannte .json, der Ende-Check nicht.
 #
 # Projektspezifische Anpassung ueber die optionale, committete Datei
-# .claude/ucdp.config.json (siehe ucdp.config.example.json). Kein Eintrag noetig,
+# .claude/uddp.config.json (siehe uddp.config.example.json). Kein Eintrag noetig,
 # solange die Defaults passen.
 #
 # Alle Funktionen sind fail-open: bei kaputter Config gelten die Defaults.
 
 # --- Defaults ---------------------------------------------------------------
 
-$script:UcdpCodeExts = @(
+$script:UddpCodeExts = @(
   # Web / JS / TS
   '.ts','.tsx','.js','.jsx','.mjs','.cjs','.mts','.cts','.vue','.svelte','.astro','.html'
   # Backend / Systemsprachen
@@ -30,14 +30,14 @@ $script:UcdpCodeExts = @(
 )
 
 # Dateien ohne Endung, die trotzdem Code sind (Vergleich auf den Dateinamen)
-$script:UcdpCodeNames = @(
+$script:UddpCodeNames = @(
   'Dockerfile','Containerfile','Makefile','CMakeLists.txt','Jenkinsfile','Vagrantfile'
   'Procfile','Justfile','Rakefile','Gemfile','Brewfile','Caddyfile'
 )
 
 # Rauschen: aendert sich staendig, hat keinen Doku-Bedarf. Wildcard-Muster (* und ?),
 # geprueft gegen den projekt-relativen Pfad mit Forward-Slashes, case-insensitiv.
-$script:UcdpExcludeGlobs = @(
+$script:UddpExcludeGlobs = @(
   # Build- und Abhaengigkeits-Ordner
   '*node_modules/*','*/.next/*','.next/*','*/dist/*','dist/*','*/build/*','build/*'
   '*/out/*','out/*','*/coverage/*','coverage/*','*/target/*','target/*','*/vendor/*'
@@ -56,20 +56,24 @@ $script:UcdpExcludeGlobs = @(
 
 # Was als "Doku nachgezogen" zaehlt. Bewusst NUR docs/ (v1.5):
 # in v1.4 quittierte jede beliebige .md irgendwo im Repo die Doku-Pflicht.
-$script:UcdpDocGlobs = @('docs/*','*/docs/*')
+$script:UddpDocGlobs = @('docs/*','*/docs/*')
 
 # --- Config-Laden -----------------------------------------------------------
 
-function Get-UcdpConfig {
+function Get-UddpConfig {
   param([string]$ProjectDir)
   $cfg = [ordered]@{
-    CodeExts     = @($script:UcdpCodeExts)
-    CodeNames    = @($script:UcdpCodeNames)
-    ExcludeGlobs = @($script:UcdpExcludeGlobs)
-    DocGlobs     = @($script:UcdpDocGlobs)
+    CodeExts     = @($script:UddpCodeExts)
+    CodeNames    = @($script:UddpCodeNames)
+    ExcludeGlobs = @($script:UddpExcludeGlobs)
+    DocGlobs     = @($script:UddpDocGlobs)
   }
   if (-not $ProjectDir) { return $cfg }
-  $path = Join-Path $ProjectDir '.claude\ucdp.config.json'
+  $path = Join-Path $ProjectDir '.claude\uddp.config.json'
+  if (-not (Test-Path -LiteralPath $path)) {
+    # Altname vor Pattern-Version 1.6 (Umbenennung UCDP -> UDDP): bleibt unbefristet gueltig.
+    $path = Join-Path $ProjectDir '.claude\ucdp.config.json'
+  }
   if (-not (Test-Path -LiteralPath $path)) { return $cfg }
   try {
     $j = (Get-Content -LiteralPath $path -Raw -ErrorAction Stop) | ConvertFrom-Json -ErrorAction Stop
@@ -92,7 +96,7 @@ function Get-UcdpConfig {
 
 # --- Klassifikation ---------------------------------------------------------
 
-function ConvertFrom-UcdpPosixPath {
+function ConvertFrom-UddpPosixPath {
   # Git Bash / MSYS liefern unter Windows Pfade wie /c/Projekte/foo oder
   # /cygdrive/c/Projekte/foo. [System.IO.Path]::GetFullPath() macht daraus
   # C:\c\Projekte\foo - ein Pfad, der aussieht, als laege er in einem fremden
@@ -105,7 +109,7 @@ function ConvertFrom-UcdpPosixPath {
   return $p
 }
 
-function ConvertTo-UcdpRelPath {
+function ConvertTo-UddpRelPath {
   param([string]$Path, [string]$ProjectDir)
   if (-not $Path) { return $null }
   $p = $Path -replace '\\','/'
@@ -121,7 +125,7 @@ function ConvertTo-UcdpRelPath {
   return $p
 }
 
-function Test-UcdpGlob {
+function Test-UddpGlob {
   param([string]$RelPath, [string[]]$Globs)
   if (-not $RelPath) { return $false }
   foreach ($g in @($Globs)) {
@@ -131,21 +135,21 @@ function Test-UcdpGlob {
   return $false
 }
 
-function Test-UcdpDoc {
+function Test-UddpDoc {
   param([string]$RelPath, $Config)
-  return (Test-UcdpGlob -RelPath $RelPath -Globs $Config.DocGlobs)
+  return (Test-UddpGlob -RelPath $RelPath -Globs $Config.DocGlobs)
 }
 
-function Test-UcdpExcluded {
+function Test-UddpExcluded {
   param([string]$RelPath, $Config)
-  return (Test-UcdpGlob -RelPath $RelPath -Globs $Config.ExcludeGlobs)
+  return (Test-UddpGlob -RelPath $RelPath -Globs $Config.ExcludeGlobs)
 }
 
-function Test-UcdpCode {
+function Test-UddpCode {
   param([string]$RelPath, $Config)
   if (-not $RelPath) { return $false }
-  if (Test-UcdpDoc      -RelPath $RelPath -Config $Config) { return $false }
-  if (Test-UcdpExcluded -RelPath $RelPath -Config $Config) { return $false }
+  if (Test-UddpDoc      -RelPath $RelPath -Config $Config) { return $false }
+  if (Test-UddpExcluded -RelPath $RelPath -Config $Config) { return $false }
   $leaf = $RelPath.Split('/')[-1]
   if ($Config.CodeNames -contains $leaf) { return $true }
   $ext = ([System.IO.Path]::GetExtension($leaf)).ToLower()
